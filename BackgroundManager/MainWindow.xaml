@@ -5,8 +5,59 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BackgroundManager"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800" SizeChanged="Window_SizeChanged" Closing="Window_Closing">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="35" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <TabControl  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                <TabItem Header="Orientation">
+                    <Grid Background="#FFE5E5E5">
+
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <Label Content="Change on Flip" />
+                                <CheckBox IsChecked="{Binding IsChangeOnFlip}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <Label Content="Landscape Path:" />
+                                <TextBox Text="{Binding LandscapePath}" MinWidth="250" />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <Label Content="Landscape Path:" />
+                                <TextBox Text="{Binding LandscapePath}" MinWidth="250" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Time">
+                    <Grid Background="#FFE5E5E5" />
+                </TabItem>
+                <TabItem Header="Settings">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="10">
+                            <Label Content="Autostart" />
+                            <CheckBox IsChecked="{Binding IsAutostart}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="10">
+                            <Label Content="Settings Path" />
+                            <TextBox Text="{Binding SettingsPath}" MinWidth="250" />
+                        </StackPanel>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Button
+                Margin="5"
+                HorizontalAlignment="Right"
+                Width="50"
+                Content="To Tray"
+                Click="btn_toTray_Click" />
+        </Grid>
     </Grid>
 </Window>
