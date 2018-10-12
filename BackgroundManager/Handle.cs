@@ -5,12 +5,14 @@ namespace BackgroundManager
     public static class Handle
     {
         public const string version = "1.0.0.0";
-        public const string repo = "";
-        public const string author = "";
+        public const string repo = "BackgroundManager";
+        public const string author = "Mayerch1";
         public const string fileName = "\\Settings.xml";
 
         public static Data data = new Data();
-        public static ImageManager imageManager = new ImageManager();
+        public static ImageManager.OrientationManager orientationManager = new ImageManager.OrientationManager();
+        public static ImageManager.IntervalManager intervalManager = new ImageManager.IntervalManager();
+        public static ImageManager.DayNightManager dayNightManager = new ImageManager.DayNightManager();
 
         public static void save()
         {

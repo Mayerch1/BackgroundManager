@@ -13,12 +13,18 @@ namespace BackgroundManager
         public MainWindow()
         {
             InitializeComponent();
-            Handle.load();
 
+            Handle.load();
+            loadNonBindings();
             //init regKey
             init();
-            //refresh background to orientation
-            Handle.imageManager.init();
+
+            //init orientation
+            Handle.orientationManager.init();
+            //init interval
+            Handle.intervalManager.init();
+            //init day night change
+            Handle.dayNightManager.init();
 
             initTrayIcon();
             checkVersion();
@@ -38,10 +44,17 @@ namespace BackgroundManager
             Handle.data.IsAutostartChanged += RegChanger.ChangeAutostart;
         }
 
+        private void loadNonBindings()
+        {
+            interval_h.Text = Handle.data.Interval.Hours.ToString();
+            interval_m.Text = Handle.data.Interval.Minutes.ToString();
+            interval_s.Text = Handle.data.Interval.Seconds.ToString();
+        }
+
         private async void checkVersion()
         {
             GithubUpdateChecker.GithubUpdateChecker git = new GithubUpdateChecker.GithubUpdateChecker(Handle.author, Handle.repo);
-            //bool isUpdate = git.CheckForUpdate(Handle.version, GithubUpdateChecker.VersionChange.Revision);
+            bool isUpdate = await git.CheckForUpdateAsync(Handle.version, GithubUpdateChecker.VersionChange.Revision);
         }
 
         private void initTrayIcon()
@@ -75,6 +88,24 @@ namespace BackgroundManager
                 trayIcon.Visible = true;
                 this.Hide();
             }
+        }
+
+        private void interval_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            if (
+                int.TryParse(interval_h.Text, out int h)
+                && int.TryParse(interval_m.Text, out int m)
+                && int.TryParse(interval_s.Text, out int s)
+                )
+            {
+                Handle.data.Interval = new TimeSpan(h, m, s);
+                Handle.intervalManager.updateTimer();
+            }
+        }
+
+        private void btn_locate(object sender, RoutedEventArgs e)
+        {
+            LocationManager.setCoordinates();
         }
     }
 }

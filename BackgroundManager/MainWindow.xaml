@@ -19,8 +19,8 @@
 
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <Label Content="Change on Flip" />
-                                <CheckBox IsChecked="{Binding IsChangeOnFlip}" VerticalAlignment="Center" />
+                                <Label Content="Enable" />
+                                <CheckBox IsChecked="{Binding IsFlipEnabled}" VerticalAlignment="Center" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="10">
                                 <Label Content="Landscape Path:" />
@@ -34,13 +34,77 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header="Time">
-                    <Grid Background="#FFE5E5E5" />
+                    <Grid Background="#FFE5E5E5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0">
+
+                            <StackPanel>
+                                <Label Content="Interval" Margin="10" />
+
+                                <StackPanel Orientation="Horizontal" Margin="10">
+                                    <Label Content="Enabled" />
+                                    <CheckBox IsChecked="{Binding IsIntervalEnabled}" VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="10">
+                                    <Label Content="Image Pool" />
+                                    <TextBox Text="{Binding IntervalPath}" MinWidth="250" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="10">
+                                    <Label Content="Interval" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBox x:Name="interval_h" Width="40" TextChanged="interval_TextChanged" />
+                                        <Label  Content="Hours" />
+                                        <TextBox x:Name="interval_m" Width="40" TextChanged="interval_TextChanged" />
+                                        <Label Content="Minutes" />
+                                        <TextBox x:Name="interval_s" Width="40" TextChanged="interval_TextChanged" />
+                                        <Label Content="Seconds" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Grid.Column="1">
+                            <StackPanel>
+                                <Label Content="Time" Margin="10" />
+
+                                <StackPanel Orientation="Horizontal" Margin="10">
+                                    <Label Content="Enabled" />
+                                    <CheckBox IsChecked="{Binding IsDayNightEnabled}" VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="10,5,10,10">
+                                    <Label Content="Day" />
+                                    <TextBox Text="{Binding DayPath}"  MinWidth="250" />
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal" Margin="10,5,10,10">
+                                    <Label Content="Night" />
+                                    <TextBox Text="{Binding NightPath}" MinWidth="250" />
+                                </StackPanel>
+
+                                <Label Content="Location" Margin="10,10,10,0" />
+
+                                <StackPanel Orientation="Horizontal" Margin="10">
+                                    <Label Content="Latitude (N/S)" />
+                                    <TextBox Text="{Binding Latitude}" MinWidth="75" />
+                                    <Label Content="Longitude (E/W)" />
+                                    <TextBox Text="{Binding Longitude}" MinWidth="75" />
+                                </StackPanel>
+                                <Button Content="Locate Me" Click="btn_locate" Width="75" HorizontalAlignment="Right" Margin="10,0,10,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
                 </TabItem>
                 <TabItem Header="Settings">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="10">
                             <Label Content="Autostart" />
-                            <CheckBox IsChecked="{Binding IsAutostart}" />
+                            <CheckBox IsChecked="{Binding IsAutostartEnabled}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="10">
                             <Label Content="Settings Path" />

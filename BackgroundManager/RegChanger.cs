@@ -11,13 +11,13 @@ namespace BackgroundManager
             if (isAutostart == true)
             {
                 var name = Assembly.GetEntryAssembly().GetName();
-                key.SetValue(name.ToString(), System.Reflection.Assembly.GetEntryAssembly().Location);
+                key.SetValue(name.Name.ToString(), System.Reflection.Assembly.GetEntryAssembly().Location);
             }
             else
             {
                 var name = Assembly.GetEntryAssembly().GetName();
 
-                key.DeleteValue(name.ToString(), false);
+                key.DeleteValue(name.Name.ToString(), false);
             }
             key.Close();
         }
