@@ -38,7 +38,7 @@ namespace BackgroundManager.ImageManager
 
         private void timer_Tick(object sender, ElapsedEventArgs e)
         {
-            setImage(Handle.data.IntervalPath);
+            setImage();
         }
     }
 }

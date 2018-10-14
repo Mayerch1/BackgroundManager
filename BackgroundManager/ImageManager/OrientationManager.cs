@@ -12,7 +12,7 @@ namespace BackgroundManager.ImageManager
 
         public void init()
         {
-            Handle.data.IsFlipChanged += changeOrientationFlip;
+            Handle.data.IsOrientationChanged += changeOrientationFlip;
 
             //enable/disable Watcher
             changeOrientationFlip(Handle.data.IsFlipEnabled);
@@ -37,18 +37,16 @@ namespace BackgroundManager.ImageManager
 
         private void orientationChanged(Orientation orientation)
         {
-            string path;
-
             if (orientation == Orientation.Landscape)
             {
-                path = Handle.data.LandscapePath;
+                Handle.data.IsLandscape = true;
             }
             else
             {
-                path = Handle.data.PortraitPath;
+                Handle.data.IsLandscape = false;
             }
 
-            setImage(path);
+            setImage();
         }
     }
 }

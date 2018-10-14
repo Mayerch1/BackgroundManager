@@ -8,6 +8,7 @@ namespace BackgroundManager
         public const string repo = "BackgroundManager";
         public const string author = "Mayerch1";
         public const string fileName = "\\Settings.xml";
+        public const string downloadUri = "https://github.com/Mayerch1/BackgroundManager/releases/latest";
 
         public static Data data = new Data();
         public static ImageManager.OrientationManager orientationManager = new ImageManager.OrientationManager();

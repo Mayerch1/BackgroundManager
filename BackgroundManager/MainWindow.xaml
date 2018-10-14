@@ -14,26 +14,8 @@
 
         <Grid Grid.Row="0">
             <TabControl  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <TabItem Header="Orientation">
-                    <Grid Background="#FFE5E5E5">
-
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <Label Content="Enable" />
-                                <CheckBox IsChecked="{Binding IsFlipEnabled}" VerticalAlignment="Center" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <Label Content="Landscape Path:" />
-                                <TextBox Text="{Binding LandscapePath}" MinWidth="250" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <Label Content="Landscape Path:" />
-                                <TextBox Text="{Binding LandscapePath}" MinWidth="250" />
-                            </StackPanel>
-                        </StackPanel>
-                    </Grid>
-                </TabItem>
-                <TabItem Header="Time">
+                <!-- ******************************************************** -->
+                <TabItem Header="Mode">
                     <Grid Background="#FFE5E5E5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -41,76 +23,135 @@
                         </Grid.ColumnDefinitions>
 
                         <Grid Grid.Column="0">
-
                             <StackPanel>
-                                <Label Content="Interval" Margin="10" />
+                                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10">
+                                    <Label Content="Enable Orientation" />
+                                    <CheckBox IsChecked="{Binding IsFlipEnabled}" VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <Separator />
 
                                 <StackPanel Orientation="Horizontal" Margin="10">
-                                    <Label Content="Enabled" />
+                                    <Label Content="Enabled Day/Night " />
+                                    <CheckBox IsChecked="{Binding IsDayNightEnabled}" VerticalAlignment="Center" />
+                                </StackPanel>
+
+                                <Separator />
+
+                                <StackPanel DockPanel.Dock="Bottom" Margin="10">
+                                    <Label Content="Location:"  Margin="0,0,0,5" />
+
+                                    <DockPanel LastChildFill="True">
+                                        <Label DockPanel.Dock="Left" Content="Latitude (N/S)" />
+
+                                        <TextBox DockPanel.Dock="Left" Text="{Binding Latitude}" HorizontalAlignment="Stretch" />
+
+                                        <Label  Content="Longitude (E/W)" Margin="10,0,0,0" />
+
+                                        <TextBox DockPanel.Dock="Right" Text="{Binding Longitude}" HorizontalAlignment="Stretch" />
+                                    </DockPanel>
+
+                                    <Button Content="Locate Me"
+                                            Click="btn_locate"
+                                            Width="75" Margin="10,10,0,0"
+                                            HorizontalAlignment="Right" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                        <Grid Grid.Column="1">
+
+                            <StackPanel>
+                                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10">
+                                    <Label Content="Enabled Interval" />
                                     <CheckBox IsChecked="{Binding IsIntervalEnabled}" VerticalAlignment="Center" />
                                 </StackPanel>
 
-                                <StackPanel Orientation="Horizontal" Margin="10">
-                                    <Label Content="Image Pool" />
-                                    <TextBox Text="{Binding IntervalPath}" MinWidth="250" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal" Margin="10">
+                                <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10,0,0,0">
                                     <Label Content="Interval" />
-                                    <StackPanel Orientation="Horizontal">
+                                    <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
                                         <TextBox x:Name="interval_h" Width="40" TextChanged="interval_TextChanged" />
-                                        <Label  Content="Hours" />
+                                        <Label  Content="Hours" Margin="0,0,5,0" />
                                         <TextBox x:Name="interval_m" Width="40" TextChanged="interval_TextChanged" />
-                                        <Label Content="Minutes" />
+                                        <Label Content="Minutes" Margin="0,0,5,0" />
                                         <TextBox x:Name="interval_s" Width="40" TextChanged="interval_TextChanged" />
                                         <Label Content="Seconds" />
                                     </StackPanel>
                                 </StackPanel>
                             </StackPanel>
                         </Grid>
+                    </Grid>
+                </TabItem>
+                <!-- ******************************************************** -->
+                <TabItem Header="Path">
+                    <!-- add/remove and edit paths here-->
+                    <Grid Background="#FFE5E5E5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
+                        <Grid Grid.Column="0">
+                            <DockPanel LastChildFill="True">
+
+                                <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="0,5,0,0">
+                                    <Button Content="Add..."
+                                            Click="btn_add_Click"
+                                            Height="25" Width="60"
+                                            HorizontalAlignment="Left" />
+                                    <Button Content="Remove"
+                                            DockPanel.Dock="Right"
+                                            Height="25" Width="60" Margin="0,0,17,0"
+                                            Click="btn_remove_Click"
+                                            HorizontalAlignment="Right" />
+                                </DockPanel>
+
+                                <ScrollViewer DockPanel.Dock="Top">
+                                    <ListView x:Name="list_Path" ItemsSource="{Binding PathList}" KeyDown="list_Path_KeyDown" SelectionChanged="list_Path_SelectionChanged">
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridViewColumn Header="Day"
+                                                                Width="35"
+                                                                DisplayMemberBinding="{Binding IsDayString}" />
+                                                <GridViewColumn Header="Landscape"
+                                                                Width="60"
+                                                                DisplayMemberBinding="{Binding IsLandscapeString}" />
+
+                                                <GridViewColumn Header="Path"
+                                                                DisplayMemberBinding="{Binding Path}" />
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+                                </ScrollViewer>
+                            </DockPanel>
+                        </Grid>
                         <Grid Grid.Column="1">
                             <StackPanel>
-                                <Label Content="Time" Margin="10" />
+                                <Label Content="Name" />
+                                <TextBox x:Name="box_Selected_Path" TextChanged="box_Selected_Path_TextChanged" />
 
-                                <StackPanel Orientation="Horizontal" Margin="10">
-                                    <Label Content="Enabled" />
-                                    <CheckBox IsChecked="{Binding IsDayNightEnabled}" VerticalAlignment="Center" />
-                                </StackPanel>
+                                <Label Content="Day or Night" />
+                                <Button x:Name="btn_Selected_isDay" Content="-" Click="btn_Selected_isDay_Click" Height="25" />
 
-                                <StackPanel Orientation="Horizontal" Margin="10,5,10,10">
-                                    <Label Content="Day" />
-                                    <TextBox Text="{Binding DayPath}"  MinWidth="250" />
-                                </StackPanel>
-
-                                <StackPanel Orientation="Horizontal" Margin="10,5,10,10">
-                                    <Label Content="Night" />
-                                    <TextBox Text="{Binding NightPath}" MinWidth="250" />
-                                </StackPanel>
-
-                                <Label Content="Location" Margin="10,10,10,0" />
-
-                                <StackPanel Orientation="Horizontal" Margin="10">
-                                    <Label Content="Latitude (N/S)" />
-                                    <TextBox Text="{Binding Latitude}" MinWidth="75" />
-                                    <Label Content="Longitude (E/W)" />
-                                    <TextBox Text="{Binding Longitude}" MinWidth="75" />
-                                </StackPanel>
-                                <Button Content="Locate Me" Click="btn_locate" Width="75" HorizontalAlignment="Right" Margin="10,0,10,0" />
+                                <Label Content="Landscape or Portrait" />
+                                <Button x:Name="btn_Selected_isLandscape" Content="-"  Click="btn_Selected_isLandscape_Click" Height="25" />
                             </StackPanel>
                         </Grid>
                     </Grid>
                 </TabItem>
+                <!-- ******************************************************** -->
                 <TabItem Header="Settings">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="10">
-                            <Label Content="Autostart" />
-                            <CheckBox IsChecked="{Binding IsAutostartEnabled}" />
+                    <Grid Background="#FFE5E5E5">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <Label Content="Autostart" />
+                                <CheckBox IsChecked="{Binding IsAutostartEnabled}" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <DockPanel Margin="10">
+                                <Label Content="Settings Path" Margin="0,0,10,0" />
+                                <TextBox Text="{Binding SettingsPath}" HorizontalAlignment="Stretch" />
+                            </DockPanel>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="10">
-                            <Label Content="Settings Path" />
-                            <TextBox Text="{Binding SettingsPath}" MinWidth="250" />
-                        </StackPanel>
-                    </StackPanel>
+                    </Grid>
                 </TabItem>
             </TabControl>
         </Grid>

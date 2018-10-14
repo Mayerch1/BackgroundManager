@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Timers;
@@ -18,29 +19,42 @@ namespace BackgroundManager.ImageManager
         /// Sets image as background, on folder chooses one random image
         /// </summary>
         /// <param name="path">path to image or directory</param>
-        protected void setImage(string path)
+        protected void setImage()
         {
-            if (String.IsNullOrWhiteSpace(path))
-                return;
+            List<string> path = new List<string>();
 
-            string selectedPath;
-            if (File.Exists(path))
+            foreach (var element in Handle.data.PathList)
             {
-                selectedPath = path;
+                //add only valid paths into the list
+                if (Handle.data.IsFlipEnabled && element.IsLandscape != Handle.data.IsLandscape)
+                    continue;
+                if (Handle.data.IsDayNightEnabled && element.IsDay != Handle.data.IsDay)
+                    continue;
+                path.Add(element.Path);
             }
-            else if (Directory.Exists(path))
-            {
-                string[] files = Directory.GetFiles(path);
 
+            if (path.Count > 0)
+            {
                 Random rnd = new Random();
+                string selectedPath = path[rnd.Next(0, path.Count)];
+                string imagePath;
 
-                selectedPath = files[rnd.Next(0, files.Length)];
+                if (File.Exists(selectedPath))
+                {
+                    imagePath = selectedPath;
+                }
+                else if (Directory.Exists(selectedPath))
+                {
+                    string[] files = Directory.GetFiles(selectedPath);
+
+                    imagePath = files[rnd.Next(0, files.Length)];
+                }
+                else
+                    return;
+
+                //set selected Path as desktop, by using user32 dll
+                SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, imagePath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
             }
-            else
-                return;
-
-            //set selected Path as desktop, by using user32 dll
-            SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, selectedPath, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
         }
     }
 }

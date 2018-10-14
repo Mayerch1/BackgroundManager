@@ -15,7 +15,6 @@ namespace BackgroundManager.ImageManager
         private DateTime sunrise = new DateTime();
         private DateTime sunset = new DateTime();
         private DateTime lastTimeCheck = new DateTime();
-        private bool isDay = true;
 
         public void init()
         {
@@ -29,15 +28,21 @@ namespace BackgroundManager.ImageManager
             timer.Enabled = false;
 
             if (Handle.data.IsDayNightEnabled)
+            {
                 timer.Start();
+                checkForDayTimeChange(true);
+            }
         }
 
         private void getRiseSetTimes()
         {
             SolarTimes solarTimes = new SolarTimes(DateTime.Now.Date, Handle.data.Latitude, Handle.data.Longitude);
 
-            sunrise = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunrise, TimeZoneInfo.Local);
-            sunset = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunset, TimeZoneInfo.Local);
+            sunrise = solarTimes.Sunrise;
+            sunset = solarTimes.Sunset;
+
+            //sunrise = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunrise, TimeZoneInfo.Local);
+            //sunset = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunset, TimeZoneInfo.Local);
 
             lastTimeCheck = DateTime.Now.Date;
         }
@@ -52,25 +57,30 @@ namespace BackgroundManager.ImageManager
 
         private void timer_Tick(object sender, ElapsedEventArgs e)
         {
+            checkForDayTimeChange();
+        }
+
+        private void checkForDayTimeChange(bool forceChange = false)
+        {
             if (lastTimeCheck < DateTime.Now.Date)
                 getRiseSetTimes();
 
-            if (DateTime.Now < sunset)
+            if (DateTime.Now < sunset && DateTime.Now > sunrise)
             {
                 //day
-                if (!isDay)
+                if (!Handle.data.IsDay || forceChange)
                 {
-                    isDay = true;
-                    setImage(Handle.data.DayPath);
+                    Handle.data.IsDay = true;
+                    setImage();
                 }
             }
-            if (DateTime.Now > sunset)
+            if (DateTime.Now > sunset || DateTime.Now < sunrise)
             {
                 //night
-                if (isDay)
+                if (Handle.data.IsDay || forceChange)
                 {
-                    isDay = false;
-                    setImage(Handle.data.NightPath);
+                    Handle.data.IsDay = false;
+                    setImage();
                 }
             }
         }

@@ -178,7 +178,11 @@
     <Compile Include="ImageManager\IntervalManager.cs" />
     <Compile Include="ImageManager\OrientationManager.cs" />
     <Compile Include="LocationManager.cs" />
+    <Compile Include="PathType.cs" />
     <Compile Include="RegChanger.cs" />
+    <Compile Include="UpdateNotifier.xaml.cs">
+      <DependentUpon>UpdateNotifier.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -194,6 +198,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UpdateNotifier.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OrientationWatcher.cs" />

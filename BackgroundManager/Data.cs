@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Xml.Serialization;
 
@@ -9,10 +11,10 @@ namespace BackgroundManager
     {
         #region delegates
 
-        public delegate void IsFlipChangedHandle(bool isChange);
+        public delegate void IsOrientationChangedHandle(bool isChange);
 
         [XmlIgnore]
-        public IsFlipChangedHandle IsFlipChanged;
+        public IsOrientationChangedHandle IsOrientationChanged;
 
         public delegate void IsAutostartChangedHandle(bool isAutostart);
 
@@ -33,40 +35,47 @@ namespace BackgroundManager
 
         #region fields
 
-        private string landscapePath = null;
-        private string portraitPath = null;
-        private string intervalPath = null;
-        private string dayPath = null;
-        private string nightPath = null;
         private string settingsPath = "";
+        private bool checkForUpdates = true;
+
+        private ObservableCollection<PathType> pathList = new ObservableCollection<PathType>();
+
         private TimeSpan interval = TimeSpan.FromHours(1);
         private long intervalTicks = 1;
 
         private double latitude = 0;
         private double longitude = 0;
 
-        private bool isFlipEnabled = false;
-        private bool isAutostartEnabled = false;
-        private bool isIntervalEnabled = false;
+        private bool isOrientationEnabled = false;
+        private bool isLandscape = true;
+
         private bool isDayNightEnabled = false;
+        private bool isDay = true;
+
+        private bool isIntervalEnabled = false;
+
+        private bool isAutostartEnabled = false;
 
         #endregion fields
 
         #region properties
 
-        public string LandscapePath { get { return landscapePath; } set { landscapePath = value; OnPropertyChanged("LandscapePath"); } }
-        public string PortraitPath { get { return portraitPath; } set { portraitPath = value; OnPropertyChanged("PortaitPath"); } }
-
-        public string IntervalPath { get { return intervalPath; } set { intervalPath = value; OnPropertyChanged("IntervalPath"); } }
-
-        public string DayPath { get { return dayPath; } set { dayPath = value; OnPropertyChanged("DayPath"); } }
-        public string NightPath { get { return nightPath; } set { nightPath = value; OnPropertyChanged("NightPath"); } }
         public string SettingsPath { get { return settingsPath; } set { settingsPath = value; OnPropertyChanged("SettingsPath"); } }
+
+        public bool CheckForUpdates { get { return checkForUpdates; } set { checkForUpdates = value; OnPropertyChanged("CheckForUpdates"); } }
+
+        public ObservableCollection<PathType> PathList { get { return pathList; } set { pathList = value; OnPropertyChanged("PathList"); } }
 
         public long IntervalTicks { get { return interval.Ticks; } set { intervalTicks = value; Interval = new TimeSpan(value); OnPropertyChanged("IntervalTicks"); } }
 
         public double Latitude { get { return latitude; } set { latitude = value; OnPropertyChanged("Latitude"); } }
         public double Longitude { get { return longitude; } set { longitude = value; OnPropertyChanged("Longitude"); } }
+
+        [XmlIgnore]
+        public bool IsDay { get { return isDay; } set { isDay = value; OnPropertyChanged("IsDay"); } }
+
+        [XmlIgnore]
+        public bool IsLandscape { get { return isLandscape; } set { isLandscape = value; OnPropertyChanged("IsLandscape"); } }
 
         [XmlIgnore]
         public string LatitudeString { get { return Latitude.ToString(); } set { if (double.TryParse(value, out double x)) { Latitude = x; } OnPropertyChanged("LatitudeString"); } }
@@ -79,11 +88,11 @@ namespace BackgroundManager
 
         public bool IsFlipEnabled
         {
-            get { return isFlipEnabled; }
+            get { return isOrientationEnabled; }
             set
             {
-                isFlipEnabled = value;
-                if (IsFlipChanged != null) { IsFlipChanged(value); }
+                isOrientationEnabled = value;
+                if (IsOrientationChanged != null) { IsOrientationChanged(value); }
                 OnPropertyChanged("ChangeOnFlip");
             }
         }
