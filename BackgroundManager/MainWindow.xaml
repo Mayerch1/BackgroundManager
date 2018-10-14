@@ -125,15 +125,15 @@
                             </DockPanel>
                         </Grid>
                         <Grid Grid.Column="1">
-                            <StackPanel>
+                            <StackPanel Margin="5">
                                 <Label Content="Name" />
-                                <TextBox x:Name="box_Selected_Path" TextChanged="box_Selected_Path_TextChanged" />
+                                <TextBox x:Name="box_Selected_Path" TextChanged="box_Selected_Path_TextChanged" Margin="0,0,10,10"/>
 
                                 <Label Content="Day or Night" />
-                                <Button x:Name="btn_Selected_isDay" Content="-" Click="btn_Selected_isDay_Click" Height="25" />
+                                <Button x:Name="btn_Selected_isDay" Content="-" Click="btn_Selected_isDay_Click" Height="25" Margin="0,0,10,10"/>
 
                                 <Label Content="Landscape or Portrait" />
-                                <Button x:Name="btn_Selected_isLandscape" Content="-"  Click="btn_Selected_isLandscape_Click" Height="25" />
+                                <Button x:Name="btn_Selected_isLandscape" Content="-"  Click="btn_Selected_isLandscape_Click" Height="25" Margin="0,0,10,10"/>
                             </StackPanel>
                         </Grid>
                     </Grid>

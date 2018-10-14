@@ -86,6 +86,20 @@ namespace BackgroundManager
             trayIcon.Visible = false;
 
             trayIcon.DoubleClick += tray_DoubleClick;
+
+            //contetx menu for trayIcon
+            System.Windows.Forms.MenuItem[] items = new System.Windows.Forms.MenuItem[2];
+
+            //next image context entry
+            items[0] = new System.Windows.Forms.MenuItem("Next Image");
+            items[0].Click += tray_nextImage;
+
+            //exit item
+            items[1] = new System.Windows.Forms.MenuItem("Exit");
+            items[1].Click += tray_Exit;
+
+            //add all context to trayIcon
+            trayIcon.ContextMenu = new System.Windows.Forms.ContextMenu(items);
         }
 
         #endregion initialisation
@@ -174,6 +188,17 @@ namespace BackgroundManager
             }
         }
 
+        private void tray_Exit(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void tray_nextImage(object sender, EventArgs e)
+        {
+            //any of the managers are deriving from the same setImage()
+            Handle.intervalManager.setImage();
+        }
+
         private void btn_toTray_Click(object sender, RoutedEventArgs e)
         {
             trayIcon.Visible = true;
@@ -255,6 +280,7 @@ namespace BackgroundManager
 
         private void btn_Selected_isDay_Click(object sender, RoutedEventArgs e)
         {
+            //toggle buttons
             if (sender is Button btn)
             {
                 switch (btn.Content as string)
@@ -277,6 +303,7 @@ namespace BackgroundManager
 
         private void btn_Selected_isLandscape_Click(object sender, RoutedEventArgs e)
         {
+            //toggle tri-state
             if (sender is Button btn)
             {
                 switch (btn.Content as string)

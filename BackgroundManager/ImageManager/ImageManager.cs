@@ -19,7 +19,7 @@ namespace BackgroundManager.ImageManager
         /// Sets image as background, on folder chooses one random image
         /// </summary>
         /// <param name="path">path to image or directory</param>
-        protected void setImage()
+        public void setImage()
         {
             List<string> path = new List<string>();
 
