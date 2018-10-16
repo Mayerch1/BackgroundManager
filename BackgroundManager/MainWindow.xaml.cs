@@ -1,4 +1,6 @@
 ﻿using System;
+using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -7,7 +9,7 @@ namespace BackgroundManager
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private System.Windows.Forms.NotifyIcon trayIcon;
 
@@ -35,6 +37,8 @@ namespace BackgroundManager
             checkVersion();
 
             this.DataContext = Handle.data;
+
+            list_Path.ItemsSource = Handle.data.PathList;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -208,10 +212,11 @@ namespace BackgroundManager
         private void tray_DoubleClick(object sender, EventArgs args)
         {
             this.Show();
+            this.WindowState = WindowState.Normal;
             trayIcon.Visible = false;
         }
 
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void Window_StateChanged(object sender, EventArgs e)
         {
             if (this.WindowState == WindowState.Minimized)
             {
@@ -323,5 +328,49 @@ namespace BackgroundManager
                 readEditBoxes();
             }
         }
+
+        private void box_saveLocation_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (sender is TextBox box)
+            {
+                Handle.data.SettingsPath = box.Text;
+                Properties.Settings.Default.Path = box.Text;
+            }
+        }
+
+        private void btn_fileChooser_Click(object sender, RoutedEventArgs e)
+        {
+            //opens filechooser
+            using (var dialog = new System.Windows.Forms.FolderBrowserDialog())
+            {
+                string oldPath = box_Selected_Path.Text;
+                if (Directory.Exists(oldPath))
+                    dialog.SelectedPath = oldPath;
+
+                var result = dialog.ShowDialog();
+
+                if (result == System.Windows.Forms.DialogResult.OK && Directory.Exists(dialog.SelectedPath))
+                {
+                    //writes into textbox
+                    //textbox saves automatically
+                    box_Selected_Path.Text = dialog.SelectedPath;
+                }
+            }
+        }
+
+        #region propertyChanged
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string info)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(null, new PropertyChangedEventArgs(info));
+            }
+        }
+
+        #endregion propertyChanged
     }
 }

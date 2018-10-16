@@ -18,6 +18,14 @@ namespace BackgroundManager
                 Handle.data.Latitude = coord.Latitude;
                 Handle.data.Longitude = coord.Longitude;
             }
+            else
+            {
+                setCoordinatesAlt();
+            }
+        }
+
+        private static void setCoordinatesAlt()
+        {
         }
     }
 }

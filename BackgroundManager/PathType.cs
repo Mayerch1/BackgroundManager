@@ -28,10 +28,10 @@ namespace BackgroundManager
         private bool? isLandscape;
         private bool? isDay;
 
-        public string Path { get { return path; } set { path = value; OnPropertyChanged("Path"); } }
-        public bool? IsLandscape { get { return isLandscape; } set { isLandscape = value; OnPropertyChanged("IsLandscape"); } }
+        public string Path { get { return path; } set { path = value; NotifyPropertyChanged("Path"); } }
+        public bool? IsLandscape { get { return isLandscape; } set { isLandscape = value; NotifyPropertyChanged("IsLandscape"); NotifyPropertyChanged("IsLandscapeString"); } }
 
-        public bool? IsDay { get { return isDay; } set { isDay = value; OnPropertyChanged("IsDay"); } }
+        public bool? IsDay { get { return isDay; } set { isDay = value; NotifyPropertyChanged("IsDay"); NotifyPropertyChanged("IsDayString"); } }
 
         [XmlIgnore]
         public string IsLandscapeString
@@ -39,9 +39,9 @@ namespace BackgroundManager
             get
             {
                 if (IsLandscape == true)
-                    return "Y";
+                    return "L";
                 else if (IsLandscape == false)
-                    return "N";
+                    return "P";
                 else
                     return "-";
             }
@@ -53,7 +53,7 @@ namespace BackgroundManager
             get
             {
                 if (IsDay == true)
-                    return "Y";
+                    return "D";
                 else if (IsDay == false)
                     return "N";
                 else
@@ -65,12 +65,11 @@ namespace BackgroundManager
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void OnPropertyChanged(string info)
+        private void NotifyPropertyChanged(String propertyName)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            if (PropertyChanged != null)
             {
-                handler(null, new PropertyChangedEventArgs(info));
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 

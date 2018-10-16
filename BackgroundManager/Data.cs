@@ -31,6 +31,11 @@ namespace BackgroundManager
         [XmlIgnore]
         public IsDayNightChangedHandle IsDayNightChanged;
 
+        public delegate void LocationChangedHandle();
+
+        [XmlIgnore]
+        public LocationChangedHandle LocationChanged;
+
         #endregion delegates
 
         #region fields
@@ -45,6 +50,9 @@ namespace BackgroundManager
 
         private double latitude = 0;
         private double longitude = 0;
+
+        private DateTime sunrise = new DateTime();
+        private DateTime sunset = new DateTime();
 
         private bool isOrientationEnabled = false;
         private bool isLandscape = true;
@@ -68,8 +76,11 @@ namespace BackgroundManager
 
         public long IntervalTicks { get { return interval.Ticks; } set { intervalTicks = value; Interval = new TimeSpan(value); OnPropertyChanged("IntervalTicks"); } }
 
-        public double Latitude { get { return latitude; } set { latitude = value; OnPropertyChanged("Latitude"); } }
-        public double Longitude { get { return longitude; } set { longitude = value; OnPropertyChanged("Longitude"); } }
+        [XmlIgnore]
+        public DateTime Sunrise { get { return sunrise; } set { sunrise = value; NotifyPropertyChanged("Sunrise"); } }
+
+        [XmlIgnore]
+        public DateTime Sunset { get { return sunset; } set { sunset = value; NotifyPropertyChanged("Sunset"); } }
 
         [XmlIgnore]
         public bool IsDay { get { return isDay; } set { isDay = value; OnPropertyChanged("IsDay"); } }
@@ -85,6 +96,28 @@ namespace BackgroundManager
 
         [XmlIgnore]
         public TimeSpan Interval { get { return interval; } set { interval = value; OnPropertyChanged("Interval"); } }
+
+        public double Latitude
+        {
+            get { return latitude; }
+            set
+            {
+                latitude = value;
+                if (LocationChanged != null) { LocationChanged(); }
+                OnPropertyChanged("Latitude");
+            }
+        }
+
+        public double Longitude
+        {
+            get { return longitude; }
+            set
+            {
+                longitude = value;
+                if (LocationChanged != null) { LocationChanged(); }
+                OnPropertyChanged("Longitude");
+            }
+        }
 
         public bool IsFlipEnabled
         {
@@ -142,6 +175,14 @@ namespace BackgroundManager
             if (handler != null)
             {
                 handler(null, new PropertyChangedEventArgs(info));
+            }
+        }
+
+        private void NotifyPropertyChanged(String propertyName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 

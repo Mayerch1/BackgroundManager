@@ -12,15 +12,17 @@ namespace BackgroundManager.ImageManager
     public class DayNightManager : ImageManager
     {
         private Timer timer = new Timer();
-        private DateTime sunrise = new DateTime();
-        private DateTime sunset = new DateTime();
         private DateTime lastTimeCheck = new DateTime();
+
+        private DateTime Sunrise { get { return Handle.data.Sunrise; } set { Handle.data.Sunrise = value; } }
+        private DateTime Sunset { get { return Handle.data.Sunset; } set { Handle.data.Sunset = value; } }
 
         public void init()
         {
-            getRiseSetTimes();
+            updateRiseSetTimes();
 
             Handle.data.IsDayNightChanged += changeIsDayNight;
+            Handle.data.LocationChanged += updateRiseSetTimes;
 
             timer.Elapsed += timer_Tick;
             //one tick per minute
@@ -34,17 +36,25 @@ namespace BackgroundManager.ImageManager
             }
         }
 
-        private void getRiseSetTimes()
+        private void updateRiseSetTimes()
         {
-            SolarTimes solarTimes = new SolarTimes(DateTime.Now.Date, Handle.data.Latitude, Handle.data.Longitude);
+            try
+            {
+                SolarTimes solarTimes = new SolarTimes(DateTime.Now.Date, Handle.data.Latitude, Handle.data.Longitude);
 
-            sunrise = solarTimes.Sunrise;
-            sunset = solarTimes.Sunset;
+                Sunrise = solarTimes.Sunrise;
+                Sunset = solarTimes.Sunset;
+
+                lastTimeCheck = DateTime.Now.Date;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                Sunrise = DateTime.MinValue;
+                Sunset = DateTime.MinValue;
+            }
 
             //sunrise = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunrise, TimeZoneInfo.Local);
             //sunset = TimeZoneInfo.ConvertTimeFromUtc(solarTimes.Sunset, TimeZoneInfo.Local);
-
-            lastTimeCheck = DateTime.Now.Date;
         }
 
         private void changeIsDayNight(bool enabled)
@@ -63,9 +73,9 @@ namespace BackgroundManager.ImageManager
         private void checkForDayTimeChange(bool forceChange = false)
         {
             if (lastTimeCheck < DateTime.Now.Date)
-                getRiseSetTimes();
+                updateRiseSetTimes();
 
-            if (DateTime.Now < sunset && DateTime.Now > sunrise)
+            if (DateTime.Now < Sunset && DateTime.Now > Sunrise)
             {
                 //day
                 if (!Handle.data.IsDay || forceChange)
@@ -74,7 +84,7 @@ namespace BackgroundManager.ImageManager
                     setImage();
                 }
             }
-            if (DateTime.Now > sunset || DateTime.Now < sunrise)
+            if (DateTime.Now > Sunset || DateTime.Now < Sunrise)
             {
                 //night
                 if (Handle.data.IsDay || forceChange)

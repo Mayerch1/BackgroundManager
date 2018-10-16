@@ -21,6 +21,7 @@ namespace BackgroundManager
         public OrientationWatcher()
         {
             lastOrientation = getOrientation();
+
             //subscribe to screen settings changing
             Microsoft.Win32.SystemEvents.DisplaySettingsChanged += DetectScreenRotation;
         }

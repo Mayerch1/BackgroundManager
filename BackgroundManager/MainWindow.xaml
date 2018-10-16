@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BackgroundManager"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" SizeChanged="Window_SizeChanged" Closing="Window_Closing">
+        Title="MainWindow" Height="450" Width="800" Closing="Window_Closing" StateChanged="Window_StateChanged">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -17,68 +17,80 @@
                 <!-- ******************************************************** -->
                 <TabItem Header="Mode">
                     <Grid Background="#FFE5E5E5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
 
-                        <Grid Grid.Column="0">
-                            <StackPanel>
-                                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10">
-                                    <Label Content="Enable Orientation" />
-                                    <CheckBox IsChecked="{Binding IsFlipEnabled}" VerticalAlignment="Center" />
-                                </StackPanel>
+                        <StackPanel Orientation="Vertical">
 
-                                <Separator />
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <Label Content="Enable Orientation" />
+                                <CheckBox IsChecked="{Binding IsFlipEnabled}" VerticalAlignment="Center" />
+                            </StackPanel>
 
-                                <StackPanel Orientation="Horizontal" Margin="10">
-                                    <Label Content="Enabled Day/Night " />
-                                    <CheckBox IsChecked="{Binding IsDayNightEnabled}" VerticalAlignment="Center" />
-                                </StackPanel>
+                            <Separator />
 
-                                <Separator />
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <Label Content="Enabled Day/Night " />
+                                <CheckBox IsChecked="{Binding IsDayNightEnabled}" VerticalAlignment="Center" />
+                            </StackPanel>
 
-                                <StackPanel DockPanel.Dock="Bottom" Margin="10">
-                                    <Label Content="Location:"  Margin="0,0,0,5" />
+                            <StackPanel Margin="10">
+                                <Label Content="Location:" />
 
-                                    <DockPanel LastChildFill="True">
-                                        <Label DockPanel.Dock="Left" Content="Latitude (N/S)" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
 
-                                        <TextBox DockPanel.Dock="Left" Text="{Binding Latitude}" HorizontalAlignment="Stretch" />
+                                    <Grid Grid.Column="0" Margin="0,0,30,0">
+                                        <DockPanel LastChildFill="True">
+                                            <Label  Content="Latitude (N/S)" />
+                                            <TextBox  Text="{Binding Latitude}" HorizontalAlignment="Stretch" />
+                                        </DockPanel>
+                                    </Grid>
+                                    <Grid Grid.Column="1" Margin="30,0,0,0">
+                                        <DockPanel LastChildFill="True">
+                                            <Label Content="Longitude (E/W)" />
+                                            <TextBox Text="{Binding Longitude}" HorizontalAlignment="Stretch" />
+                                        </DockPanel>
+                                    </Grid>
+                                </Grid>
 
-                                        <Label  Content="Longitude (E/W)" Margin="10,0,0,0" />
-
-                                        <TextBox DockPanel.Dock="Right" Text="{Binding Longitude}" HorizontalAlignment="Stretch" />
-                                    </DockPanel>
-
-                                    <Button Content="Locate Me"
+                                <Button Content="Locate Me"
                                             Click="btn_locate"
-                                            Width="75" Margin="10,10,0,0"
+                                            Width="75" Margin="5,10,0,0"
                                             HorizontalAlignment="Right" />
+
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Sunrise:" />
+                                    <Label>
+                                        <TextBlock Text="{Binding Sunrise, StringFormat='HH:mm'}" />
+                                    </Label>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="Sunset:" />
+
+                                    <Label>
+                                        <TextBlock Text="{Binding Sunset, StringFormat='HH:mm'}" />
+                                    </Label>
                                 </StackPanel>
                             </StackPanel>
-                        </Grid>
-                        <Grid Grid.Column="1">
 
-                            <StackPanel>
-                                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10">
-                                    <Label Content="Enabled Interval" />
-                                    <CheckBox IsChecked="{Binding IsIntervalEnabled}" VerticalAlignment="Center" />
-                                </StackPanel>
+                            <Separator />
 
-                                <StackPanel DockPanel.Dock="Bottom" Orientation="Vertical" Margin="10,0,0,0">
-                                    <Label Content="Interval" />
-                                    <StackPanel Orientation="Horizontal" Margin="5,0,0,0">
-                                        <TextBox x:Name="interval_h" Width="40" TextChanged="interval_TextChanged" />
-                                        <Label  Content="Hours" Margin="0,0,5,0" />
-                                        <TextBox x:Name="interval_m" Width="40" TextChanged="interval_TextChanged" />
-                                        <Label Content="Minutes" Margin="0,0,5,0" />
-                                        <TextBox x:Name="interval_s" Width="40" TextChanged="interval_TextChanged" />
-                                        <Label Content="Seconds" />
-                                    </StackPanel>
-                                </StackPanel>
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10">
+                                <Label Content="Enabled Interval" />
+                                <CheckBox IsChecked="{Binding IsIntervalEnabled}" VerticalAlignment="Center" />
                             </StackPanel>
-                        </Grid>
+
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <TextBox x:Name="interval_h" Width="40" TextChanged="interval_TextChanged" />
+                                <Label  Content="Hours" Margin="0,0,10,0" />
+                                <TextBox x:Name="interval_m" Width="40" TextChanged="interval_TextChanged" />
+                                <Label Content="Minutes" Margin="0,0,10,0" />
+                                <TextBox x:Name="interval_s" Width="40" TextChanged="interval_TextChanged" />
+                                <Label Content="Seconds" />
+                            </StackPanel>
+                        </StackPanel>
                     </Grid>
                 </TabItem>
                 <!-- ******************************************************** -->
@@ -126,14 +138,23 @@
                         </Grid>
                         <Grid Grid.Column="1">
                             <StackPanel Margin="5">
-                                <Label Content="Name" />
-                                <TextBox x:Name="box_Selected_Path" TextChanged="box_Selected_Path_TextChanged" Margin="0,0,10,10"/>
+                                <Label Content="Path" Margin="-5,0,0,0" />
 
-                                <Label Content="Day or Night" />
-                                <Button x:Name="btn_Selected_isDay" Content="-" Click="btn_Selected_isDay_Click" Height="25" Margin="0,0,10,10"/>
+                                <DockPanel LastChildFill="True">
+                                    <Button DockPanel.Dock="Right" Content="..." Click="btn_fileChooser_Click" Margin="5,0,0,0" MinWidth="35" VerticalContentAlignment="Center" />
+                                    <TextBox x:Name="box_Selected_Path"
+                                             DockPanel.Dock="Left"
+                                             TextWrapping="Wrap"
+                                             MaxLines="2"
+                                             TextChanged="box_Selected_Path_TextChanged"
+                                             HorizontalAlignment="Stretch" />
+                                </DockPanel>
 
-                                <Label Content="Landscape or Portrait" />
-                                <Button x:Name="btn_Selected_isLandscape" Content="-"  Click="btn_Selected_isLandscape_Click" Height="25" Margin="0,0,10,10"/>
+                                <Label Content="Day or Night" Margin="-5,0,0,0" />
+                                <Button x:Name="btn_Selected_isDay" Content="-" Click="btn_Selected_isDay_Click" Height="25" Margin="0,0,10,10" />
+
+                                <Label Content="Landscape or Portrait" Margin="-5,0,0,0" VerticalContentAlignment="Center" />
+                                <Button x:Name="btn_Selected_isLandscape" Content="-"  Click="btn_Selected_isLandscape_Click" Height="25" Margin="0,0,10,10" />
                             </StackPanel>
                         </Grid>
                     </Grid>
@@ -148,7 +169,7 @@
                             </StackPanel>
                             <DockPanel Margin="10">
                                 <Label Content="Settings Path" Margin="0,0,10,0" />
-                                <TextBox Text="{Binding SettingsPath}" HorizontalAlignment="Stretch" />
+                                <TextBox Text="{Binding SettingsPath}" TextChanged="box_saveLocation_TextChanged" HorizontalAlignment="Stretch" />
                             </DockPanel>
                         </StackPanel>
                     </Grid>

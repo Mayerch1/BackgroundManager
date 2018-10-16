@@ -1,10 +1,14 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace BackgroundManager
 {
     public static class Handle
     {
         public const string version = "1.0.0.0";
+
+        private const string saveFolder = "\\BackgroundManager";
+
         public const string repo = "BackgroundManager";
         public const string author = "Mayerch1";
         public const string fileName = "\\Settings.xml";
@@ -59,6 +63,9 @@ namespace BackgroundManager
             {
                 propertyPath = "";
             }
+
+            if (String.IsNullOrWhiteSpace(propertyPath))
+                propertyPath = System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + saveFolder;
 
             //load persistent data
             if (System.IO.File.Exists(propertyPath + fileName))
