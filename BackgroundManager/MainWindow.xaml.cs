@@ -37,8 +37,6 @@ namespace BackgroundManager
             checkVersion();
 
             this.DataContext = Handle.data;
-
-            list_Path.ItemsSource = Handle.data.PathList;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -367,7 +365,7 @@ namespace BackgroundManager
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null)
             {
-                handler(null, new PropertyChangedEventArgs(info));
+                handler(this, new PropertyChangedEventArgs(info));
             }
         }
 

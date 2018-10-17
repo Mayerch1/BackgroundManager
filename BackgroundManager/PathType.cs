@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using System.Xml.Serialization;
 
 namespace BackgroundManager
@@ -28,10 +23,10 @@ namespace BackgroundManager
         private bool? isLandscape;
         private bool? isDay;
 
-        public string Path { get { return path; } set { path = value; NotifyPropertyChanged("Path"); } }
-        public bool? IsLandscape { get { return isLandscape; } set { isLandscape = value; NotifyPropertyChanged("IsLandscape"); NotifyPropertyChanged("IsLandscapeString"); } }
+        public string Path { get { return path; } set { path = value; OnPropertyChanged("Path"); } }
+        public bool? IsLandscape { get { return isLandscape; } set { isLandscape = value; OnPropertyChanged("IsLandscape"); OnPropertyChanged("IsLandscapeString"); } }
 
-        public bool? IsDay { get { return isDay; } set { isDay = value; NotifyPropertyChanged("IsDay"); NotifyPropertyChanged("IsDayString"); } }
+        public bool? IsDay { get { return isDay; } set { isDay = value; OnPropertyChanged("IsDay"); OnPropertyChanged("IsDayString"); } }
 
         [XmlIgnore]
         public string IsLandscapeString
@@ -65,11 +60,12 @@ namespace BackgroundManager
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void NotifyPropertyChanged(String propertyName)
+        private void OnPropertyChanged(string info)
         {
-            if (PropertyChanged != null)
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
             {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                handler(this, new PropertyChangedEventArgs(info));
             }
         }
 

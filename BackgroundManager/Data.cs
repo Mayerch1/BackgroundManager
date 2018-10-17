@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Xml.Serialization;
@@ -77,10 +76,10 @@ namespace BackgroundManager
         public long IntervalTicks { get { return interval.Ticks; } set { intervalTicks = value; Interval = new TimeSpan(value); OnPropertyChanged("IntervalTicks"); } }
 
         [XmlIgnore]
-        public DateTime Sunrise { get { return sunrise; } set { sunrise = value; NotifyPropertyChanged("Sunrise"); } }
+        public DateTime Sunrise { get { return sunrise; } set { sunrise = value; OnPropertyChanged("Sunrise"); } }
 
         [XmlIgnore]
-        public DateTime Sunset { get { return sunset; } set { sunset = value; NotifyPropertyChanged("Sunset"); } }
+        public DateTime Sunset { get { return sunset; } set { sunset = value; OnPropertyChanged("Sunset"); } }
 
         [XmlIgnore]
         public bool IsDay { get { return isDay; } set { isDay = value; OnPropertyChanged("IsDay"); } }
@@ -174,15 +173,7 @@ namespace BackgroundManager
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null)
             {
-                handler(null, new PropertyChangedEventArgs(info));
-            }
-        }
-
-        private void NotifyPropertyChanged(String propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                handler(this, new PropertyChangedEventArgs(info));
             }
         }
 
