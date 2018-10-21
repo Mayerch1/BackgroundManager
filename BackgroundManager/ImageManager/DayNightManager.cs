@@ -9,8 +9,17 @@ namespace BackgroundManager.ImageManager
         private Timer timer = new Timer();
         private DateTime lastTimeCheck = new DateTime();
 
-        private DateTime Sunrise { get { return Handle.data.Sunrise; } set { Handle.data.Sunrise = value; } }
-        private DateTime Sunset { get { return Handle.data.Sunset; } set { Handle.data.Sunset = value; } }
+        private DateTime Sunrise
+        {
+            get => Handle.data.Sunrise;
+            set => Handle.data.Sunrise = value;
+        }
+
+        private DateTime Sunset
+        {
+            get => Handle.data.Sunset;
+            set => Handle.data.Sunset = value;
+        }
 
         public void init()
         {

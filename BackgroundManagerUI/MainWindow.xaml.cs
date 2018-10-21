@@ -1,112 +1,79 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 
-namespace BackgroundManager
+namespace BackgroundManagerUI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
-        private System.Windows.Forms.NotifyIcon trayIcon;
+        public bool IsToClose = true;
+        private DataStorage.Data data = new DataStorage.Data();
+
+        public DataStorage.Data Data
+        {
+            get => data;
+            set { data = value; OnPropertyChanged("Data"); }
+        }
 
         public MainWindow()
         {
-            InitializeComponent();
-
-            initTrayIcon();
-
-            trayIcon.Visible = true;
-            this.Hide();
-
-            Handle.load();
-            loadNonBindings();
-            //init regKey
-            init();
-
-            //init orientation
-            Handle.orientationManager.init();
-            //init interval
-            Handle.intervalManager.init();
-            //init day night change
-            Handle.dayNightManager.init();
-
-            checkVersion();
-
-            this.DataContext = Handle.data;
         }
+
+        #region returnSection
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Handle.save();
         }
 
-        #region initialisation
-
-        private void init()
+        private void Window_Closed(object sender, EventArgs e)
         {
-            Handle.data.IsAutostartChanged += RegChanger.ChangeAutostart;
         }
 
-        private void loadNonBindings()
+        private void btn_toTray_Click(object sender, RoutedEventArgs e)
         {
-            interval_h.Text = Handle.data.Interval.Hours.ToString();
-            interval_m.Text = Handle.data.Interval.Minutes.ToString();
-            interval_s.Text = Handle.data.Interval.Seconds.ToString();
+            sendToTray();
         }
 
-        private async void checkVersion()
+        private void Window_StateChanged(object sender, EventArgs e)
         {
-            if (Handle.data.CheckForUpdates)
+            if (this.WindowState == WindowState.Minimized)
             {
-                GithubUpdateChecker.GithubUpdateChecker git = new GithubUpdateChecker.GithubUpdateChecker(Handle.author, Handle.repo);
-                bool isUpdate = await git.CheckForUpdateAsync(Handle.version, GithubUpdateChecker.VersionChange.Revision);
-
-                if (isUpdate)
-                {
-                    var notifier = new UpdateNotifier();
-
-                    notifier.ShowDialog();
-                    bool? result = notifier.result;
-
-                    if (result == true)
-                        System.Diagnostics.Process.Start(Handle.downloadUri);
-                    else if (result == null)
-                        Handle.data.CheckForUpdates = false;
-                }
+                sendToTray();
             }
         }
 
-        private void initTrayIcon()
+        private void sendToTray()
         {
-            trayIcon = new System.Windows.Forms.NotifyIcon();
-
-            trayIcon.Icon = Properties.Resources.TrayIcon;
-            trayIcon.Visible = false;
-
-            trayIcon.DoubleClick += tray_DoubleClick;
-
-            //contetx menu for trayIcon
-            System.Windows.Forms.MenuItem[] items = new System.Windows.Forms.MenuItem[2];
-
-            //next image context entry
-            items[0] = new System.Windows.Forms.MenuItem("Next Image");
-            items[0].Click += tray_nextImage;
-
-            //exit item
-            items[1] = new System.Windows.Forms.MenuItem("Exit");
-            items[1].Click += tray_Exit;
-
-            //add all context to trayIcon
-            trayIcon.ContextMenu = new System.Windows.Forms.ContextMenu(items);
+            IsToClose = false;
+            this.Close();
         }
 
-        #endregion initialisation
+        #endregion returnSection
 
-        private void setEditBoxes(PathType path)
+        public void loadNonBindings()
+        {
+            interval_h.Text = Data.Interval.Hours.ToString();
+            interval_m.Text = Data.Interval.Minutes.ToString();
+            interval_s.Text = Data.Interval.Seconds.ToString();
+        }
+
+        private void setEditBoxes(DataStorage.PathType path)
         {
             switch (path.IsDay)
             {
@@ -143,7 +110,7 @@ namespace BackgroundManager
 
         private void readEditBoxes()
         {
-            if (list_Path.SelectedItem is PathType item)
+            if (list_Path.SelectedItem is DataStorage.PathType item)
             {
                 //path
                 item.Path = box_Selected_Path.Text;
@@ -190,39 +157,6 @@ namespace BackgroundManager
             }
         }
 
-        private void tray_Exit(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void tray_nextImage(object sender, EventArgs e)
-        {
-            //any of the managers are deriving from the same setImage()
-            Handle.intervalManager.setImage();
-        }
-
-        private void btn_toTray_Click(object sender, RoutedEventArgs e)
-        {
-            trayIcon.Visible = true;
-            this.Hide();
-        }
-
-        private void tray_DoubleClick(object sender, EventArgs args)
-        {
-            this.Show();
-            this.WindowState = WindowState.Normal;
-            trayIcon.Visible = false;
-        }
-
-        private void Window_StateChanged(object sender, EventArgs e)
-        {
-            if (this.WindowState == WindowState.Minimized)
-            {
-                trayIcon.Visible = true;
-                this.Hide();
-            }
-        }
-
         private void interval_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             if (
@@ -231,14 +165,19 @@ namespace BackgroundManager
                 && int.TryParse(interval_s.Text, out int s)
                 )
             {
-                Handle.data.Interval = new TimeSpan(h, m, s);
-                Handle.intervalManager.updateTimer();
+                Data.Interval = new TimeSpan(h, m, s);
             }
         }
 
         private void btn_locate(object sender, RoutedEventArgs e)
         {
-            LocationManager.setCoordinates();
+            var result = LocationManager.setCoordinates();
+
+            if (result.Item1 != null && result.Item2 != null)
+            {
+                Data.Latitude = (double)result.Item1;
+                Data.Longitude = (double)result.Item2;
+            }
         }
 
         private void btn_remove_Click(object sender, RoutedEventArgs e)
@@ -247,17 +186,17 @@ namespace BackgroundManager
 
             while (list.Count > 0)
             {
-                if (list[0] is PathType path)
+                if (list[0] is DataStorage.PathType path)
                 {
                     //removes the item from PathList and from local list
-                    Handle.data.PathList.Remove(path);
+                    Data.PathList.Remove(path);
                 }
             }
         }
 
         private void btn_add_Click(object sender, RoutedEventArgs e)
         {
-            Handle.data.PathList.Add(new PathType());
+            Data.PathList.Add(new DataStorage.PathType());
         }
 
         private void list_Path_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -270,7 +209,7 @@ namespace BackgroundManager
         {
             var item = list_Path.SelectedItem;
 
-            if (item is PathType path)
+            if (item is DataStorage.PathType path)
             {
                 setEditBoxes(path);
             }
@@ -331,8 +270,7 @@ namespace BackgroundManager
         {
             if (sender is TextBox box)
             {
-                Handle.data.SettingsPath = box.Text;
-                Properties.Settings.Default.Path = box.Text;
+                Data.SettingsPath = box.Text;
             }
         }
 
@@ -363,10 +301,7 @@ namespace BackgroundManager
         private void OnPropertyChanged(string info)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(info));
-            }
+            handler?.Invoke(this, new PropertyChangedEventArgs(info));
         }
 
         #endregion propertyChanged

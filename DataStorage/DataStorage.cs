@@ -3,12 +3,17 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Xml.Serialization;
 
-namespace BackgroundManager
+namespace DataStorage
 {
     [Serializable()]
     public class Data : INotifyPropertyChanged
     {
         #region delegates
+
+        public delegate void SaveLocationChangedHandle(string newPath);
+
+        [XmlIgnore]
+        public SaveLocationChangedHandle SaveLocationChanged;
 
         public delegate void IsOrientationChangedHandle(bool isChange);
 
@@ -20,10 +25,15 @@ namespace BackgroundManager
         [XmlIgnore]
         public IsAutostartChangedHandle IsAutostartChanged;
 
-        public delegate void IsIntervalChangedHandle(bool isEnabled);
+        public delegate void IsIntervalEnabledChangedHandle(bool isEnabled);
 
         [XmlIgnore]
-        public IsIntervalChangedHandle IsIntervalChanged;
+        public IsIntervalEnabledChangedHandle IsIntervalEnabledEnabledChanged;
+
+        public delegate void IsIntervalLengthChangedHandle();
+
+        [XmlIgnore]
+        public IsIntervalLengthChangedHandle IsIntervalLengthChanged;
 
         public delegate void IsDayNightChangedHandle(bool isEnabled);
 
@@ -38,6 +48,8 @@ namespace BackgroundManager
         #endregion delegates
 
         #region fields
+
+        public bool isFirstStart = true;
 
         private string settingsPath = "";
         private bool checkForUpdates = true;
@@ -67,97 +79,151 @@ namespace BackgroundManager
 
         #region properties
 
-        public string SettingsPath { get { return settingsPath; } set { settingsPath = value; OnPropertyChanged("SettingsPath"); } }
+        public bool CheckForUpdates
+        {
+            get => checkForUpdates;
+            set { checkForUpdates = value; OnPropertyChanged("CheckForUpdates"); }
+        }
 
-        public bool CheckForUpdates { get { return checkForUpdates; } set { checkForUpdates = value; OnPropertyChanged("CheckForUpdates"); } }
+        public ObservableCollection<PathType> PathList
+        {
+            get => pathList;
+            set { pathList = value; OnPropertyChanged("PathList"); }
+        }
 
-        public ObservableCollection<PathType> PathList { get { return pathList; } set { pathList = value; OnPropertyChanged("PathList"); } }
-
-        public long IntervalTicks { get { return interval.Ticks; } set { intervalTicks = value; Interval = new TimeSpan(value); OnPropertyChanged("IntervalTicks"); } }
-
-        [XmlIgnore]
-        public DateTime Sunrise { get { return sunrise; } set { sunrise = value; OnPropertyChanged("Sunrise"); } }
-
-        [XmlIgnore]
-        public DateTime Sunset { get { return sunset; } set { sunset = value; OnPropertyChanged("Sunset"); } }
-
-        [XmlIgnore]
-        public bool IsDay { get { return isDay; } set { isDay = value; OnPropertyChanged("IsDay"); } }
-
-        [XmlIgnore]
-        public bool IsLandscape { get { return isLandscape; } set { isLandscape = value; OnPropertyChanged("IsLandscape"); } }
+        public long IntervalTicks
+        {
+            get => interval.Ticks;
+            set { intervalTicks = value; Interval = new TimeSpan(value); OnPropertyChanged("IntervalTicks"); }
+        }
 
         [XmlIgnore]
-        public string LatitudeString { get { return Latitude.ToString(); } set { if (double.TryParse(value, out double x)) { Latitude = x; } OnPropertyChanged("LatitudeString"); } }
+        public DateTime Sunrise
+        {
+            get => sunrise;
+            set { sunrise = value; OnPropertyChanged("Sunrise"); }
+        }
 
         [XmlIgnore]
-        public string LongitudeString { get { return Longitude.ToString(); } set { if (double.TryParse(value, out double x)) { Longitude = x; } OnPropertyChanged("LongitudeString"); } }
+        public DateTime Sunset
+        {
+            get => sunset;
+            set { sunset = value; OnPropertyChanged("Sunset"); }
+        }
 
         [XmlIgnore]
-        public TimeSpan Interval { get { return interval; } set { interval = value; OnPropertyChanged("Interval"); } }
+        public bool IsDay
+        {
+            get => isDay;
+            set { isDay = value; OnPropertyChanged("IsDay"); }
+        }
+
+        [XmlIgnore]
+        public bool IsLandscape
+        {
+            get => isLandscape;
+            set { isLandscape = value; OnPropertyChanged("IsLandscape"); }
+        }
+
+        [XmlIgnore]
+        public string LatitudeString
+        {
+            get => Latitude.ToString();
+            set { if (double.TryParse(value, out double x)) { Latitude = x; } OnPropertyChanged("LatitudeString"); }
+        }
+
+        [XmlIgnore]
+        public string LongitudeString
+        {
+            get => Longitude.ToString();
+            set { if (double.TryParse(value, out double x)) { Longitude = x; } OnPropertyChanged("LongitudeString"); }
+        }
+
+        [XmlIgnore]
+        public TimeSpan Interval
+        {
+            get => interval;
+            set
+            {
+                interval = value;
+                IsIntervalLengthChanged?.Invoke();
+                OnPropertyChanged("Interval");
+            }
+        }
+
+        public string SettingsPath
+        {
+            get => settingsPath;
+            set
+            {
+                settingsPath = value;
+                SaveLocationChanged?.Invoke(value);
+                OnPropertyChanged("SettingsPath");
+            }
+        }
 
         public double Latitude
         {
-            get { return latitude; }
+            get => latitude;
             set
             {
                 latitude = value;
-                if (LocationChanged != null) { LocationChanged(); }
+                LocationChanged?.Invoke();
                 OnPropertyChanged("Latitude");
             }
         }
 
         public double Longitude
         {
-            get { return longitude; }
+            get => longitude;
             set
             {
                 longitude = value;
-                if (LocationChanged != null) { LocationChanged(); }
+                LocationChanged?.Invoke();
                 OnPropertyChanged("Longitude");
             }
         }
 
         public bool IsFlipEnabled
         {
-            get { return isOrientationEnabled; }
+            get => isOrientationEnabled;
             set
             {
                 isOrientationEnabled = value;
-                if (IsOrientationChanged != null) { IsOrientationChanged(value); }
+                IsOrientationChanged?.Invoke(value);
                 OnPropertyChanged("ChangeOnFlip");
             }
         }
 
         public bool IsAutostartEnabled
         {
-            get { return isAutostartEnabled; }
+            get => isAutostartEnabled;
             set
             {
                 isAutostartEnabled = value;
-                if (IsAutostartChanged != null) { IsAutostartChanged(value); }
+                IsAutostartChanged?.Invoke(value);
                 OnPropertyChanged("IsAutostart");
             }
         }
 
         public bool IsIntervalEnabled
         {
-            get { return isIntervalEnabled; }
+            get => isIntervalEnabled;
             set
             {
                 isIntervalEnabled = value;
-                if (IsIntervalChanged != null) { IsIntervalChanged(value); }
+                IsIntervalEnabledEnabledChanged?.Invoke(value);
                 OnPropertyChanged("IsIntervalEnabled");
             }
         }
 
         public bool IsDayNightEnabled
         {
-            get { return isDayNightEnabled; }
+            get => isDayNightEnabled;
             set
             {
                 isDayNightEnabled = value;
-                if (IsDayNightChanged != null) { IsDayNightChanged(value); }
+                IsDayNightChanged?.Invoke(value);
                 OnPropertyChanged("IsDayNightEnabled");
             }
         }
@@ -171,10 +237,7 @@ namespace BackgroundManager
         private void OnPropertyChanged(string info)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(info));
-            }
+            handler?.Invoke(this, new PropertyChangedEventArgs(info));
         }
 
         #endregion propertyChanged

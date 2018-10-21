@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace BackgroundManager
+namespace BackgroundManagerUI
 {
     /// <summary>
     /// Interaction logic for UpdateNotifier.xaml
@@ -25,8 +25,6 @@ namespace BackgroundManager
         {
             result = false;
             InitializeComponent();
-
-            this.Title = "An Update is available";
 
             System.Media.SystemSounds.Exclamation.Play();
         }

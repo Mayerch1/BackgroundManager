@@ -1,4 +1,5 @@
 ﻿using System;
+using DataStorage;
 
 namespace BackgroundManager
 {
@@ -17,6 +18,13 @@ namespace BackgroundManager
         public static ImageManager.OrientationManager orientationManager = new ImageManager.OrientationManager();
         public static ImageManager.IntervalManager intervalManager = new ImageManager.IntervalManager();
         public static ImageManager.DayNightManager dayNightManager = new ImageManager.DayNightManager();
+
+        public static void init()
+        {
+            orientationManager.init();
+            intervalManager.init();
+            dayNightManager.init();
+        }
 
         public static void save()
         {
@@ -45,7 +53,7 @@ namespace BackgroundManager
                 return;
             }
 
-            System.Xml.Serialization.XmlSerializer serializer = new System.Xml.Serialization.XmlSerializer(fileType);
+            var serializer = new System.Xml.Serialization.XmlSerializer(fileType);
             serializer.Serialize(file, data);
             file.Flush();
             file.Close();
@@ -74,7 +82,7 @@ namespace BackgroundManager
                     System.IO.StreamReader file = System.IO.File.OpenText(propertyPath + fileName);
                     Type fileType = data.GetType();
 
-                    System.Xml.Serialization.XmlSerializer xmlSerial = new System.Xml.Serialization.XmlSerializer(fileType);
+                    var xmlSerial = new System.Xml.Serialization.XmlSerializer(fileType);
                     data = xmlSerial.Deserialize(file) as Data;
                     file.Close();
                 }
@@ -82,7 +90,9 @@ namespace BackgroundManager
             }
 
             if (data == null)
+            
                 data = new Data();
+            
 
             data.SettingsPath = propertyPath;
         }

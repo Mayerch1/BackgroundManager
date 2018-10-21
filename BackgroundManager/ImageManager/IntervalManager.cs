@@ -1,4 +1,5 @@
-﻿using System.Timers;
+﻿using System;
+using System.Timers;
 
 namespace BackgroundManager.ImageManager
 {
@@ -8,7 +9,8 @@ namespace BackgroundManager.ImageManager
 
         public void init()
         {
-            Handle.data.IsIntervalChanged += changeIsInterval;
+            Handle.data.IsIntervalEnabledEnabledChanged += changeIsInterval;
+            Handle.data.IsIntervalLengthChanged += IsIntervalLengthChanged;
 
             timer.Elapsed += timer_Tick;
             timer.Interval = Handle.data.Interval.TotalMilliseconds;
@@ -16,6 +18,11 @@ namespace BackgroundManager.ImageManager
 
             if (Handle.data.IsIntervalEnabled)
                 timer.Start();
+        }
+
+        private void IsIntervalLengthChanged()
+        {
+            updateTimer();
         }
 
         private void changeIsInterval(bool isEnabled)
@@ -26,7 +33,7 @@ namespace BackgroundManager.ImageManager
                 timer.Stop();
         }
 
-        public void updateTimer()
+        private void updateTimer()
         {
             timer.Interval = Handle.data.Interval.TotalMilliseconds;
         }
