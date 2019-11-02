@@ -11,37 +11,30 @@ namespace DataStorage
         #region delegates
 
         public delegate void SaveLocationChangedHandle(string newPath);
-
         [XmlIgnore]
         public SaveLocationChangedHandle SaveLocationChanged;
 
         public delegate void IsOrientationChangedHandle(bool isChange);
-
         [XmlIgnore]
         public IsOrientationChangedHandle IsOrientationChanged;
 
         public delegate void IsAutostartChangedHandle(bool isAutostart);
-
         [XmlIgnore]
         public IsAutostartChangedHandle IsAutostartChanged;
 
         public delegate void IsIntervalEnabledChangedHandle(bool isEnabled);
-
         [XmlIgnore]
         public IsIntervalEnabledChangedHandle IsIntervalEnabledEnabledChanged;
 
         public delegate void IsIntervalLengthChangedHandle();
-
         [XmlIgnore]
         public IsIntervalLengthChangedHandle IsIntervalLengthChanged;
 
         public delegate void IsDayNightChangedHandle(bool isEnabled);
-
         [XmlIgnore]
         public IsDayNightChangedHandle IsDayNightChanged;
 
         public delegate void LocationChangedHandle();
-
         [XmlIgnore]
         public LocationChangedHandle LocationChanged;
 
@@ -74,6 +67,8 @@ namespace DataStorage
         private bool isIntervalEnabled = false;
 
         private bool isAutostartEnabled = false;
+
+        private bool setOneImagePerScreen = true;
 
         #endregion fields
 
@@ -225,6 +220,17 @@ namespace DataStorage
                 isDayNightEnabled = value;
                 IsDayNightChanged?.Invoke(value);
                 OnPropertyChanged("IsDayNightEnabled");
+            }
+        }
+
+        public bool SetOneImagePerScreen
+        {
+            get => setOneImagePerScreen;
+            set
+            {
+                setOneImagePerScreen = value;
+
+                OnPropertyChanged("SetOneImagePerScreen");
             }
         }
 

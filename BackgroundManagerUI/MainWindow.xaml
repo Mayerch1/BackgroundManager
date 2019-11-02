@@ -21,8 +21,26 @@
                         <StackPanel Orientation="Vertical">
 
                             <StackPanel Orientation="Horizontal" Margin="10">
-                                <Label Content="Enable Orientation" />
-                                <CheckBox IsChecked="{Binding IsFlipEnabled}" VerticalAlignment="Center" />
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Grid Grid.Column="0" Margin="0,0,30,0">
+                                        <DockPanel LastChildFill="True">
+                                            <Label Content="Enable Orientation" />
+                                            <CheckBox IsChecked="{Binding IsFlipEnabled}" VerticalAlignment="Center" />
+                                        </DockPanel>
+                                    </Grid>
+                                    <Grid Grid.Column="1" Margin="30,0,0,0">
+                                        <DockPanel LastChildFill="True">
+                                            <Label Content="Set one Image per Monitor" HorizontalAlignment="Right"/>
+                                            <CheckBox IsChecked="{Binding SetOneImagePerScreen}" VerticalAlignment="Center" />
+                                        </DockPanel>
+                                    </Grid>
+                                </Grid>
                             </StackPanel>
 
                             <Separator />
