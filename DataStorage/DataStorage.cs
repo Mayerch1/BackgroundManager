@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace DataStorage
@@ -8,6 +10,9 @@ namespace DataStorage
     [Serializable()]
     public class Data : INotifyPropertyChanged
     {
+        #region types
+        public enum WallpaperType { SameImagePerScreen, SeperateImagePerScreen, StretchOverScreens};
+        #endregion types
         #region delegates
 
         public delegate void SaveLocationChangedHandle(string newPath);
@@ -37,6 +42,10 @@ namespace DataStorage
         public delegate void LocationChangedHandle();
         [XmlIgnore]
         public LocationChangedHandle LocationChanged;
+
+        public delegate void WallpaperTypeChangedHandle();
+        [XmlIgnore]
+        public WallpaperTypeChangedHandle WallpaperTypeChanged;
 
         #endregion delegates
 
@@ -68,7 +77,7 @@ namespace DataStorage
 
         private bool isAutostartEnabled = false;
 
-        private bool setOneImagePerScreen = true;
+        private WallpaperType selectedWallpaperType = WallpaperType.SameImagePerScreen;
 
         #endregion fields
 
@@ -223,14 +232,25 @@ namespace DataStorage
             }
         }
 
-        public bool SetOneImagePerScreen
+
+        public WallpaperType SelectedWallpaperType
         {
-            get => setOneImagePerScreen;
+            get => selectedWallpaperType;
             set
             {
-                setOneImagePerScreen = value;
+                selectedWallpaperType = value;
+                WallpaperTypeChanged?.BeginInvoke(null, null);
+                OnPropertyChanged("SelectedWallpaperType");
+            }
+        }
 
-                OnPropertyChanged("SetOneImagePerScreen");
+
+        [XmlIgnore]
+        public IEnumerable<WallpaperType> WallpaperTypeValues
+        {
+            get
+            {
+                return Enum.GetValues(typeof(WallpaperType)).Cast<WallpaperType>();
             }
         }
 

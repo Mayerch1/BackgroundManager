@@ -15,24 +15,6 @@ namespace BackgroundManager.ImageManager
         private const int SPIF_SENDWININICHANGE = 0x2;
         private const int SPIF_UPDATEINIFILE = 0x1;
 
-
-
-        /// <summary>
-        /// Delete all files in directory except of the Settings.xml
-        /// </summary>
-        /// <param name="path">path to directory</param>
-        private void DeleteExceptSave(string path)
-        {            
-            var files = Directory.GetFiles(path);
-            foreach(var file in files)
-            {
-                if(file != path + "\\Settings.xml")
-                {
-                    File.Delete(file);
-                }
-            }
-        }
-
         /// <summary>
         /// Select random images out of the valid pool
         /// </summary>
@@ -103,11 +85,12 @@ namespace BackgroundManager.ImageManager
         /// <summary>
         /// Sets image as background, on folder chooses one random image
         /// </summary>
-        /// <param name="path">path to image or directory</param>
         public void setImage()
         {
+            // registry key to set wallpaper mode (tile, stretch, fill,...)
+            Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true);
             // set one image per screen
-            if (Handle.data.SetOneImagePerScreen) {
+            if (Handle.data.SelectedWallpaperType == DataStorage.Data.WallpaperType.SeperateImagePerScreen) {
 
                 int yMin = int.MaxValue, yMax = int.MinValue;
                 int xMin = int.MaxValue, xMax = int.MinValue;
@@ -157,14 +140,18 @@ namespace BackgroundManager.ImageManager
                     }
                     // delete all files to not produce leaking temp-files
                     // the last image must persist, so windows can re-set the wallpaper at events like resolution change
-                    DeleteExceptSave(Handle.data.SettingsPath);
-                    string fileName = Handle.data.SettingsPath + "\\" + Guid.NewGuid().ToString() + ".png";
+                    string uuid = ((GuidAttribute)typeof(Program).Assembly.GetCustomAttributes(typeof(GuidAttribute), true)[0]).Value;
+                    string fileName = Handle.data.SettingsPath + "\\" + uuid + ".png";
+                    if (File.Exists(fileName))
+                    {
+                        File.Delete(fileName);
+                    }
+                    
                     bmp.Save(fileName);
 
                     // set wallpaper mode to "tile" in the registry
-                    Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true);
-                    key.SetValue(@"PicturePosition", 0);
-                    key.SetValue(@"TileWallpaper", 1);
+                    key.SetValue(@"PicturePosition", "0");
+                    key.SetValue(@"TileWallpaper", "1");
 
                     //set selected Path as desktop, by using user32 dll
                     SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, fileName, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
@@ -174,6 +161,18 @@ namespace BackgroundManager.ImageManager
             // set one image over all screens
             else
             {
+                // set wallpaper mode to "fit"
+                if(Handle.data.SelectedWallpaperType == DataStorage.Data.WallpaperType.SameImagePerScreen)
+                {
+                    key.SetValue(@"PicturePosition", "6");
+                    key.SetValue(@"TileWallpaper", "0");
+                }
+                // set wallpaper mode to "tile"
+                else if (Handle.data.SelectedWallpaperType == DataStorage.Data.WallpaperType.StretchOverScreens)
+                {
+                    key.SetValue(@"PicturePosition", "0");
+                    key.SetValue(@"TileWallpaper", "1");
+                }
                 List<string> images = selectRndImage(1);
                 if (images.Count > 0)
                 {

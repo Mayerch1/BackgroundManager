@@ -36,9 +36,10 @@
                                     </Grid>
                                     <Grid Grid.Column="1" Margin="30,0,0,0">
                                         <DockPanel LastChildFill="True">
-                                            <Label Content="Set one Image per Monitor" HorizontalAlignment="Right"/>
-                                            <CheckBox IsChecked="{Binding SetOneImagePerScreen}" VerticalAlignment="Center" />
+                                            <Label Content="Wallpaper Mode" HorizontalAlignment="Right"/>
+                                            <ComboBox SelectedItem="{Binding SelectedWallpaperType}" ItemsSource="{Binding WallpaperTypeValues}"/>
                                         </DockPanel>
+                                        
                                     </Grid>
                                 </Grid>
                             </StackPanel>

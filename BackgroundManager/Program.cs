@@ -37,6 +37,7 @@ namespace BackgroundManager
 
             Handle.data.IsAutostartChanged += RegChanger.ChangeAutostart;
             Handle.data.SaveLocationChanged += updateSaveLocation;
+            Handle.data.WallpaperTypeChanged += wallpaperTypeChanged;
 
             WinFormApplication.ApplicationExit += Application_ApplicationExit;
             WinFormApplication.Run();
@@ -81,6 +82,13 @@ namespace BackgroundManager
         {
             var updateChecker = new GithubUpdateChecker.GithubUpdateChecker(Handle.author, Handle.repo);
             return await updateChecker.CheckForUpdateAsync(Handle.version, GithubUpdateChecker.VersionChange.Revision);
+        }
+
+
+        private static void wallpaperTypeChanged()
+        {
+            // all image managers are deriving from the base ImageManager
+            Handle.intervalManager.setImage();
         }
 
         private static void updateSaveLocation(string newPath)
