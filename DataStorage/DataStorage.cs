@@ -10,8 +10,16 @@ namespace DataStorage
     [Serializable()]
     public class Data : INotifyPropertyChanged
     {
+        #region statics
+
+        public static string wallpaperSetterPath = "../WallpaperSetter/WallpaperSetter.exe";
+
+        public static string imageCacheUUid = "7af49940-bf8a-4358-86b0-517c9cacd0ab";
+        public static string monInfoUUid = "bba0cc0a-8ea3-4834-ab5d-565f818a8f61";
+
+        #endregion statics
         #region types
-        public enum WallpaperType { SameImagePerScreen, SeperateImagePerScreen, StretchOverScreens};
+        public enum WallpaperType { SameImagePerScreen, SeperateImagePerScreen, StretchOverScreens };
         #endregion types
         #region delegates
 
@@ -51,9 +59,12 @@ namespace DataStorage
 
         #region fields
 
+
         public bool isFirstStart = true;
 
+        private string settingsDir = "";
         private string settingsPath = "";
+
         private bool checkForUpdates = true;
 
         private ObservableCollection<PathType> pathList = new ObservableCollection<PathType>();
@@ -160,9 +171,19 @@ namespace DataStorage
             get => settingsPath;
             set
             {
-                settingsPath = value;
-                SaveLocationChanged?.Invoke(value);
+                settingsPath = value;                
                 OnPropertyChanged("SettingsPath");
+            }
+        }
+
+        public string SettingsDir
+        {
+            get => settingsDir;
+            set
+            {
+                settingsDir = value;
+                SaveLocationChanged?.Invoke(value);
+                OnPropertyChanged("SettingsDir");
             }
         }
 

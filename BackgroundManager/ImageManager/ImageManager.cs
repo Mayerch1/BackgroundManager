@@ -1,25 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
+
+using DataStorage;
 
 namespace BackgroundManager.ImageManager
 {
     public class ImageManager
     {
-        [DllImport("user32")]
-        private static extern int SystemParametersInfo(int uAction, int uParam, string pncMetrics, int fuWinIni);
-
-        private const int SPI_SETDESKWALLPAPER = 20;
-        private const int SPIF_SENDWININICHANGE = 0x2;
-        private const int SPIF_UPDATEINIFILE = 0x1;
-
-        /// <summary>
-        /// Select random images out of the valid pool
-        /// </summary>
-        /// <param name="count">number of images to select</param>
-        /// <returns>paths to images, size can be anything ranging 0...(count-1)</returns>
         private List<string> selectRndImage(int count)
         {
             List<string> pool = new List<string>();
@@ -27,8 +17,8 @@ namespace BackgroundManager.ImageManager
 
             // all images pools which are specified by the user
             // a pool can be an image or a folder (non recursive)
-            foreach(var element in Handle.data.PathList)
-            {                
+            foreach (var element in Handle.data.PathList)
+            {
                 //add only valid pools into the list
                 if (Handle.data.IsFlipEnabled && element.IsLandscape != Handle.data.IsLandscape)
                     continue;
@@ -38,14 +28,14 @@ namespace BackgroundManager.ImageManager
             }
 
 
-            if(pool.Count > 0)
+            if (pool.Count > 0)
             {
                 // select one random entry of the pool
                 Random rnd = new Random(Environment.TickCount);
 
                 // choose count pictures, 
                 // intentionally allow the same picture multiple times
-                for(int i=0; i<count; i++)
+                for (int i = 0; i < count; i++)
                 {
                     string selectedPath = pool[rnd.Next(0, pool.Count)];
                     string imagePath;
@@ -76,7 +66,7 @@ namespace BackgroundManager.ImageManager
                     }
 
                     images.Add(imagePath);
-                }   
+                }
             }
             // return images, count can be smaller than requested
             return images;
@@ -87,100 +77,88 @@ namespace BackgroundManager.ImageManager
         /// </summary>
         public void setImage()
         {
-            // registry key to set wallpaper mode (tile, stretch, fill,...)
-            Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true);
+            // create all important striings
+            string cacheFile = Path.Combine(Handle.data.SettingsDir, Data.monInfoUUid + ".txt");
+            string imageFile = Path.Combine(Handle.data.SettingsDir, Data.imageCacheUUid + ".png");
+
+            string setWallpaperStr = Data.wallpaperSetterPath + " " + "--set-image";
+
+
             // set one image per screen
-            if (Handle.data.SelectedWallpaperType == DataStorage.Data.WallpaperType.SeperateImagePerScreen) {
+            if (Handle.data.SelectedWallpaperType == DataStorage.Data.WallpaperType.SeperateImagePerScreen)
+            {
+                // get monitor info from dedicated c++ application
+                var infoProcess = Process.Start(Data.wallpaperSetterPath + " " + "--monitor" + " " + cacheFile);
+                infoProcess.WaitForExit();
 
-                int yMin = int.MaxValue, yMax = int.MinValue;
-                int xMin = int.MaxValue, xMax = int.MinValue;
+                // read the data
+                string monInfoStr = File.ReadAllText(cacheFile);
 
-                int width;
-                int height;
+                // parse the monitor informatino and select random image for each monitor
+                DataStorage.MonInfo monInfo = new MonInfo(monInfoStr);
+                List<string> imageList = selectRndImage(monInfo.count);
 
-                // get rectacle around all screens
-                foreach(var screen in System.Windows.Forms.Screen.AllScreens)
+                if (imageList.Count < monInfo.count)
                 {
-                    int tYmin = screen.Bounds.Y;
-                    int tYmax = tYmin + screen.Bounds.Height;
-
-                    int tXmin = screen.Bounds.X;
-                    int tXmax = tXmin + screen.Bounds.Width;
-
-                    yMin = yMin < tYmin ? yMin : tYmin;
-                    yMax = yMax > tYmax ? yMax : tYmax;
-
-                    xMin = xMin < tXmin ? xMin : tXmin;
-                    xMax = xMax > tXmax ? xMax : tXmax;
+                    // empty paths/ invalid paths within the path-list
+                    return;
                 }
 
-                width = xMax - xMin;
-                height = yMax - yMin;                  
-
-                // compose big image for all monitors
-                using (Bitmap bmp = new Bitmap(width, height))
+                for (int i = 0; i < monInfo.count; i++)
                 {
-                    using(Graphics g = Graphics.FromImage(bmp))
-                    {
-                        int count = System.Windows.Forms.Screen.AllScreens.Length;
-                        List<string> images = selectRndImage(count);
+                    monInfo.monitors[i].image = imageList[i];
+                }
 
-                        if(images.Count >= count)
+                // create one image for virtual monitors
+                using (Bitmap bmp = new Bitmap(monInfo.width, monInfo.height))
+                {
+                    using (Graphics g = Graphics.FromImage(bmp))
+                    {
+                        // place every image as they are in the virtual monitor of windows
+                        foreach (var screen in monInfo.monitors)
                         {
-                            // place every image as they are in the virtual monitor of windows
-                            for(int i=0; i<count; i++)
-                            {
-                                Rectangle screen = System.Windows.Forms.Screen.AllScreens[i].Bounds;
-                                Image image = Image.FromFile(images[i]);
+                            Image image = Image.FromFile(screen.image);
 
-                                g.DrawImage(image, screen.X - xMin, screen.Y - yMin, screen.Width, screen.Height);
-                            }
+                            int screenHeight = screen.bottom - screen.top;
+                            int screenWidth = screen.right - screen.left;
+
+                            g.DrawImage(image, screen.left - monInfo.xMin, screen.top - monInfo.yMin, screenWidth, screenHeight);
                         }
-                        // else do not set image                                                                              
                     }
-                    // delete all files to not produce leaking temp-files
-                    // the last image must persist, so windows can re-set the wallpaper at events like resolution change
-                    string uuid = ((GuidAttribute)typeof(Program).Assembly.GetCustomAttributes(typeof(GuidAttribute), true)[0]).Value;
-                    string fileName = Handle.data.SettingsPath + "\\" + uuid + ".png";
-                    if (File.Exists(fileName))
+
+                    // delete the old image first
+                    if (File.Exists(imageFile))
                     {
-                        File.Delete(fileName);
+                        File.Delete(imageFile);
                     }
-                    
-                    bmp.Save(fileName);
 
-                    // set wallpaper mode to "tile" in the registry
-                    key.SetValue(@"PicturePosition", "0");
-                    key.SetValue(@"TileWallpaper", "1");
-
-                    //set selected Path as desktop, by using user32 dll
-                    SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, fileName, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+                    bmp.Save(imageFile);               
+    
                 }
+
+                setWallpaperStr += " " + "1" + " " + imageFile;
 
             }
             // set one image over all screens
             else
             {
-                // set wallpaper mode to "fit"
-                if(Handle.data.SelectedWallpaperType == DataStorage.Data.WallpaperType.SameImagePerScreen)
+                switch (Handle.data.SelectedWallpaperType)
                 {
-                    key.SetValue(@"PicturePosition", "6");
-                    key.SetValue(@"TileWallpaper", "0");
-                }
-                // set wallpaper mode to "tile"
-                else if (Handle.data.SelectedWallpaperType == DataStorage.Data.WallpaperType.StretchOverScreens)
-                {
-                    key.SetValue(@"PicturePosition", "0");
-                    key.SetValue(@"TileWallpaper", "1");
-                }
-                List<string> images = selectRndImage(1);
-                if (images.Count > 0)
-                {
-                    //set selected Path as desktop, by using user32 dll
-                    SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, images[0] , SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+                    case Data.WallpaperType.SameImagePerScreen:
+                        setWallpaperStr += " " + "0" + " " + imageFile;
+                        break;
+                    case Data.WallpaperType.StretchOverScreens:
+                        setWallpaperStr += " " + "2" + " " + imageFile;
+                        break;
+                    default:
+                        setWallpaperStr += " " + "0" + " " + imageFile;
+                        break;
                 }
             }
-            
+
+            var setProcess = Process.Start(setWallpaperStr);
+            setProcess.WaitForExit();
+
         }
     }
 }

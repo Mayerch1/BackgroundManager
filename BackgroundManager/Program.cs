@@ -1,22 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
-using BackgroundManagerUI;
-using WinFormApplication = System.Windows.Forms.Application;
-using WpfApplication = System.Windows.Application;
+using DataStorage;
 
 namespace BackgroundManager
 {
-    internal class Program
+    class Program
     {
-        private static NotifyIcon _trayIcon;
+        //private static NotifyIcon _trayIcon;
 
         [STAThread]
         private static void Main(string[] args)
@@ -35,12 +25,12 @@ namespace BackgroundManager
             //load all different managers
             Handle.init();
 
-            Handle.data.IsAutostartChanged += RegChanger.ChangeAutostart;
+            Handle.data.IsAutostartChanged += changeAutostart;
             Handle.data.SaveLocationChanged += updateSaveLocation;
             Handle.data.WallpaperTypeChanged += wallpaperTypeChanged;
 
-            WinFormApplication.ApplicationExit += Application_ApplicationExit;
-            WinFormApplication.Run();
+            //WinFormApplication.ApplicationExit += Application_ApplicationExit;
+            //WinFormApplication.Run();
         }
 
         private static void Application_ApplicationExit(object sender, EventArgs e)
@@ -50,39 +40,41 @@ namespace BackgroundManager
 
         private static void initTrayIcon()
         {
-            const int count = 2;
+            //const int count = 2;
 
-            _trayIcon = new System.Windows.Forms.NotifyIcon();
+            //_trayIcon = new System.Windows.Forms.NotifyIcon();
 
-            _trayIcon.Text = @"BackgroundManager";
-            _trayIcon.Icon = Properties.Resources.TrayIcon;
+            //_trayIcon.Text = @"BackgroundManager";
+            //_trayIcon.Icon = Properties.Resources.TrayIcon;
 
-            _trayIcon.DoubleClick += tray_DoubleClick;
+            //_trayIcon.DoubleClick += tray_DoubleClick;
 
-            //contetx menu for trayIcon
-            System.Windows.Forms.MenuItem[] items = new System.Windows.Forms.MenuItem[count];
+            ////contetx menu for trayIcon
+            //System.Windows.Forms.MenuItem[] items = new System.Windows.Forms.MenuItem[count];
 
-            //next image context entry
-            items[count - 2] = new System.Windows.Forms.MenuItem("Next Image");
-            items[count - 2].Click += tray_nextImage;
+            ////next image context entry
+            //items[count - 2] = new System.Windows.Forms.MenuItem("Next Image");
+            //items[count - 2].Click += tray_nextImage;
 
-            //update, only if update avaivable
+            ////update, only if update avaivable
 
-            //exit item
-            items[count - 1] = new System.Windows.Forms.MenuItem("Exit");
-            items[count - 1].Click += tray_Exit;
+            ////exit item
+            //items[count - 1] = new System.Windows.Forms.MenuItem("Exit");
+            //items[count - 1].Click += tray_Exit;
 
-            //add all context to trayIcon
-            _trayIcon.ContextMenu = new System.Windows.Forms.ContextMenu(items);
+            ////add all context to trayIcon
+            //_trayIcon.ContextMenu = new System.Windows.Forms.ContextMenu(items);
 
-            _trayIcon.Visible = true;
+            //_trayIcon.Visible = true;
         }
 
-        private static async Task<bool> checkVersion()
-        {
-            var updateChecker = new GithubUpdateChecker.GithubUpdateChecker(Handle.author, Handle.repo);
-            return await updateChecker.CheckForUpdateAsync(Handle.version, GithubUpdateChecker.VersionChange.Revision);
-        }
+        
+        //private static async Task<bool> checkVersion()
+        //{
+        //    //var updateChecker = new GithubUpdateChecker.GithubUpdateChecker(Handle.author, Handle.repo);
+        //    //return await updateChecker.CheckForUpdateAsync(Handle.version, GithubUpdateChecker.VersionChange.Revision);
+            
+        //}
 
 
         private static void wallpaperTypeChanged()
@@ -93,46 +85,46 @@ namespace BackgroundManager
 
         private static void updateSaveLocation(string newPath)
         {
-            if (System.IO.Directory.Exists(newPath))
-                Properties.Settings.Default.Path = newPath;
+            //if (System.IO.Directory.Exists(newPath))
+            //    Properties.Settings.Default.Path = newPath;
         }
 
         private static void openUI()
         {
-            _trayIcon.Visible = false;
+            //_trayIcon.Visible = false;
 
-            var ui = new BackgroundManagerUI.MainWindow();
-            //*-------copy data--------*/
-            ui.InitializeComponent();
+            //var ui = new BackgroundManagerUI.MainWindow();
+            ////*-------copy data--------*/
+            //ui.InitializeComponent();
 
-            ui.Data = Handle.data;
-            ui.DataContext = ui.Data;
+            //ui.Data = Handle.data;
+            //ui.DataContext = ui.Data;
 
-            ui.loadNonBindings();
-            //*------------------------*/
+            //ui.loadNonBindings();
+            ////*------------------------*/
 
-            ui.ShowDialog();
+            //ui.ShowDialog();
 
-            _trayIcon.Visible = true;
+            //_trayIcon.Visible = true;
 
-            if (ui.IsToClose)
-                WinFormApplication.Exit();
+            //if (ui.IsToClose)
+            //    WinFormApplication.Exit();
 
-            ui = null;
+            //ui = null;
         }
 
         private static void openUpdate()
         {
-            var notifier = new BackgroundManagerUI.UpdateNotifier();
+            //var notifier = new BackgroundManagerUI.UpdateNotifier();
 
-            notifier.ShowDialog();
+            //notifier.ShowDialog();
 
-            bool? result = notifier.result;
+            //bool? result = notifier.result;
 
-            if (result == true)
-                System.Diagnostics.Process.Start(Handle.downloadUri);
-            else if (result == null)
-                Handle.data.CheckForUpdates = false;
+            //if (result == true)
+            //    System.Diagnostics.Process.Start(Handle.downloadUri);
+            //else if (result == null)
+            //    Handle.data.CheckForUpdates = false;
         }
 
         private static void TrayUpdateClick(object sender, EventArgs e)
@@ -153,7 +145,25 @@ namespace BackgroundManager
 
         private static void tray_Exit(object sender, EventArgs e)
         {
-            WinFormApplication.Exit();
+            //WinFormApplication.Exit();
+        }
+
+        private static void changeAutostart(bool isAutostart)
+        {
+            //Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
+
+            //if (isAutostart == true)
+            //{
+            //    var name = Assembly.GetEntryAssembly().GetName();
+            //    key.SetValue(name.Name.ToString(), System.Reflection.Assembly.GetEntryAssembly().Location);
+            //}
+            //else
+            //{
+            //    var name = Assembly.GetEntryAssembly().GetName();
+
+            //    key.DeleteValue(name.Name.ToString(), false);
+            //}
+            //key.Close();
         }
     }
 }

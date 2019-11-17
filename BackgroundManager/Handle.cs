@@ -1,17 +1,18 @@
 ﻿using System;
+using System.IO;
 using DataStorage;
 
 namespace BackgroundManager
 {
-    public static class Handle
+    public class Handle
     {
-        public const string version = "1.0.0.0";
+        public const string version = "1.1.0";
 
         private const string saveFolder = "\\BackgroundManager";
 
         public const string repo = "BackgroundManager";
         public const string author = "Mayerch1";
-        public const string fileName = "\\Settings.xml";
+        public const string fileName = "Settings.xml";
         public const string downloadUri = "https://github.com/Mayerch1/BackgroundManager/releases/latest";
 
         public static Data data = new Data();
@@ -30,7 +31,7 @@ namespace BackgroundManager
         {
             try
             {
-                Properties.Settings.Default.Path = data.SettingsPath;
+                Properties.Settings.Default.Path = data.SettingsDir;
             }
             catch {/*nothing*/ }
             Properties.Settings.Default.Save();
@@ -38,15 +39,15 @@ namespace BackgroundManager
             Type fileType = data.GetType();
 
             //test for existing dir
-            if (!String.IsNullOrEmpty(data.SettingsPath))
+            if (!String.IsNullOrEmpty(data.SettingsDir))
             {
-                System.IO.Directory.CreateDirectory(data.SettingsPath);
+                System.IO.Directory.CreateDirectory(data.SettingsDir);
             }
 
             System.IO.StreamWriter file;
             try
             {
-                file = System.IO.File.CreateText(data.SettingsPath + fileName);
+                file = System.IO.File.CreateText(data.SettingsPath);
             }
             catch (Exception)
             {
@@ -74,12 +75,14 @@ namespace BackgroundManager
             if (String.IsNullOrWhiteSpace(propertyPath))
                 propertyPath = System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + saveFolder;
 
+            string settingsPath = Path.Combine(propertyPath, fileName);
+
             //load persistent data
-            if (System.IO.File.Exists(propertyPath + fileName))
+            if (System.IO.File.Exists(settingsPath))
             {
                 try
                 {
-                    System.IO.StreamReader file = System.IO.File.OpenText(propertyPath + fileName);
+                    System.IO.StreamReader file = System.IO.File.OpenText(settingsPath);
                     Type fileType = data.GetType();
 
                     var xmlSerial = new System.Xml.Serialization.XmlSerializer(fileType);
@@ -90,11 +93,11 @@ namespace BackgroundManager
             }
 
             if (data == null)
-            
                 data = new Data();
-            
 
-            data.SettingsPath = propertyPath;
+            // (re-)save settings dir and path
+            data.SettingsDir = propertyPath;
+            data.SettingsPath = Path.Combine(propertyPath, fileName);
         }
     }
 }
