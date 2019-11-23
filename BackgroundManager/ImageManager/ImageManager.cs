@@ -76,19 +76,21 @@ namespace BackgroundManager.ImageManager
         /// Sets image as background, on folder chooses one random image
         /// </summary>
         public void setImage()
-        {
-            // create all important striings
-            string cacheFile = Path.Combine(Handle.data.SettingsDir, Data.monInfoUUid + ".txt");
-            string imageFile = Path.Combine(Handle.data.SettingsDir, Data.imageCacheUUid + ".png");
+        {   
+            // create all important striings            
+            string cacheFile = Path.Combine(Handle.data.TempDir, (Data.uuidMonitorInfo + ".txt"));
+            string imageFile = Path.Combine(Handle.data.SettingsDir, Data.uuidImageCache + ".png");
 
-            string setWallpaperStr = Data.wallpaperSetterPath + " " + "--set-image";
-
+            string setWallpaperExec = "\"" + Path.Combine(Directory.GetCurrentDirectory(), Data.wallpaperSetterPath) + "\"";
+            string setWallpaperArg = setWallpaperExec + " " + "--set-image";
 
             // set one image per screen
             if (Handle.data.SelectedWallpaperType == DataStorage.Data.WallpaperType.SeperateImagePerScreen)
             {
-                // get monitor info from dedicated c++ application
-                var infoProcess = Process.Start(Data.wallpaperSetterPath + " " + "--monitor" + " " + cacheFile);
+                // get monitor info from dedicated c++ application, "" around argument and path
+                string getMonInfoArg = setWallpaperExec + " " + "--monitor" + " \"" + cacheFile + "\"";                
+
+                var infoProcess = Process.Start(getMonInfoArg);
                 infoProcess.WaitForExit();
 
                 // read the data
@@ -136,7 +138,7 @@ namespace BackgroundManager.ImageManager
     
                 }
 
-                setWallpaperStr += " " + "1" + " " + imageFile;
+                setWallpaperArg += " " + "1" + " \"" + imageFile + "\"";
 
             }
             // set one image over all screens
@@ -145,18 +147,18 @@ namespace BackgroundManager.ImageManager
                 switch (Handle.data.SelectedWallpaperType)
                 {
                     case Data.WallpaperType.SameImagePerScreen:
-                        setWallpaperStr += " " + "0" + " " + imageFile;
+                        setWallpaperArg += " " + "0" + " \"" + imageFile + "\"";
                         break;
                     case Data.WallpaperType.StretchOverScreens:
-                        setWallpaperStr += " " + "2" + " " + imageFile;
+                        setWallpaperArg += " " + "2" + " \"" + imageFile + "\"";
                         break;
                     default:
-                        setWallpaperStr += " " + "0" + " " + imageFile;
+                        setWallpaperArg += " " + "0" + " \"" + imageFile + "\"";
                         break;
                 }
             }
 
-            var setProcess = Process.Start(setWallpaperStr);
+            var setProcess = Process.Start(setWallpaperArg);
             setProcess.WaitForExit();
 
         }

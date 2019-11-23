@@ -29,7 +29,7 @@ namespace BackgroundManager.ImageManager
             Handle.data.LocationChanged += updateRiseSetTimes;
 
             timer.Elapsed += timer_Tick;
-            //one tick per minute
+            //one tick per minute (resolution = 1m)
             timer.Interval = 60000;
             timer.Enabled = false;
 

@@ -20,4 +20,14 @@
     <ProjectReference Include="..\DataStorage\DataStorage.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="GithubVersionChecker">
+      <HintPath>..\packages\GithubVersionChecker\lib\GithubVersionChecker.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="call &quot;$(SolutionDir)scripts\copyBin.bat&quot; $(ProjectDir)$(OutDir) $(SolutionDir)" />
+  </Target>
+
 </Project>

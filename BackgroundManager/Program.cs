@@ -30,7 +30,7 @@ namespace BackgroundManager
             Handle.data.WallpaperTypeChanged += wallpaperTypeChanged;
 
             //WinFormApplication.ApplicationExit += Application_ApplicationExit;
-            //WinFormApplication.Run();
+            //WinFormApplication.Run();            
         }
 
         private static void Application_ApplicationExit(object sender, EventArgs e)
@@ -69,12 +69,12 @@ namespace BackgroundManager
         }
 
         
-        //private static async Task<bool> checkVersion()
-        //{
-        //    //var updateChecker = new GithubUpdateChecker.GithubUpdateChecker(Handle.author, Handle.repo);
-        //    //return await updateChecker.CheckForUpdateAsync(Handle.version, GithubUpdateChecker.VersionChange.Revision);
+        private static async Task<bool> checkVersion()
+        {
+            var updateChecker = new GithubUpdateChecker.GithubUpdateChecker(Handle.author, Handle.repo);
+            return await updateChecker.CheckForUpdateAsync(Handle.version, GithubUpdateChecker.VersionChange.Minor);
             
-        //}
+        }
 
 
         private static void wallpaperTypeChanged()

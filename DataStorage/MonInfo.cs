@@ -28,12 +28,11 @@ namespace DataStorage
         public MonInfo(string args) { parseString(args); }
 
 
-
         public void parseString(string str)
         {
             string[] args = str.Split(' ');
 
-            int count = int.Parse(args[0]);
+            count = int.Parse(args[0]);
 
             for(int i=1; i<(count)*4+1; i+=4)
             {
@@ -55,7 +54,7 @@ namespace DataStorage
                 monitors.Add(mon);
             }
 
-            width = xMax = xMin;
+            width = xMax - xMin;
             height = yMax - yMin;
         }
 

@@ -27,8 +27,8 @@ int getMonitorCount(char** argv) {
 
 
 int setImageMode(char** argv) {
-    const char* imagePath = argv[2];
-    int imageMode = atoi(argv[3]);
+    const char* imagePath = argv[3];
+    int imageMode = atoi(argv[2]);
 
     WallpaperType type;
 
@@ -58,10 +58,10 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 
-    if (argv[1] == "--monitor") {
+    if (strcmp(argv[1], "--monitor") == 0) {
         return getMonitorCount(argv);
     }
-    else if(argv[1] == "--set-image"){
+    else if(strcmp(argv[1], "--set-image") == 0){
         return setImageMode(argv);
     }
 

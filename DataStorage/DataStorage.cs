@@ -12,10 +12,12 @@ namespace DataStorage
     {
         #region statics
 
-        public static string wallpaperSetterPath = "../WallpaperSetter/WallpaperSetter.exe";
+        public static string wallpaperSetterPath = "WallpaperSetter.exe";
 
-        public static string imageCacheUUid = "7af49940-bf8a-4358-86b0-517c9cacd0ab";
-        public static string monInfoUUid = "bba0cc0a-8ea3-4834-ab5d-565f818a8f61";
+        // these are used to store temporary information, like coordinates of all screens
+        public static string uuidImageCache = "7af49940-bf8a-4358-86b0-517c9cacd0ab";
+        public static string uuidMonitorInfo = "bba0cc0a-8ea3-4834-ab5d-565f818a8f61";
+        public static string uuidApplication = "95f8dc8d-0e8e-4c6d-9776-1445b21123b0";
 
         #endregion statics
         #region types
@@ -57,13 +59,13 @@ namespace DataStorage
 
         #endregion delegates
 
+
         #region fields
-
-
         public bool isFirstStart = true;
 
         private string settingsDir = "";
         private string settingsPath = "";
+        private string tempDir = "";
 
         private bool checkForUpdates = true;
 
@@ -166,6 +168,7 @@ namespace DataStorage
             }
         }
 
+        [XmlIgnore]
         public string SettingsPath
         {
             get => settingsPath;
@@ -176,6 +179,18 @@ namespace DataStorage
             }
         }
 
+        [XmlIgnore]
+        public string TempDir
+        {
+            get => tempDir;
+            set
+            {
+                tempDir = value;
+                OnPropertyChanged("TempDir");
+            }
+        }
+
+        [XmlIgnore]
         public string SettingsDir
         {
             get => settingsDir;
