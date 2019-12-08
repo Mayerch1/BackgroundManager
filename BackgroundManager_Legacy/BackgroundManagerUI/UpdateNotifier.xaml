@@ -1,0 +1,46 @@
+﻿<Window x:Class="BackgroundManagerUI.UpdateNotifier"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BackgroundManagerUI"
+        mc:Ignorable="d"
+        Title="BackgroundMgr - Update" Height="200" Width="350">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="20,0,20,0">
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">
+                The version you are running is outdated.
+                <LineBreak />
+                <LineBreak />
+                Would you like to download a newer version?
+            </TextBlock>
+        </Grid>
+        <Grid Grid.Row="1" Margin="50,10,50,15">
+            <DockPanel LastChildFill="False">
+
+                <Button Click="btn_Yes_Click" Content="Yes"
+                        HorizontalAlignment="Left"
+                        DockPanel.Dock="Left"
+                        MinWidth="45"
+                        Margin="10,0,0,0" />
+
+                <Button Click="btn_Never_Click" Content="Never ask again"
+                        HorizontalAlignment="Right"
+                        DockPanel.Dock="Right"
+                        MinWidth="45"
+                        Margin="10,0,0,0" />
+
+                <Button  Click="btn_No_Click" Content="No"
+                         HorizontalAlignment="Center"
+                         DockPanel.Dock="Right"
+                         MinWidth="45"
+                         Margin="10,0,0,0" />
+            </DockPanel>
+        </Grid>
+    </Grid>
+</Window>
