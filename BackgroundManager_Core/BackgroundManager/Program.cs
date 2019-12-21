@@ -40,9 +40,7 @@ namespace BackgroundManager
         
 
         private static void autoStartChanged(bool isEnabled)
-        {
-            string callPath = "\"" + Path.Combine(Directory.GetCurrentDirectory(), Data.autostartEnablePath) + "\"";
-            string execPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+        {   string execPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
 
             // execPath contains the path to the dll, however the path to the exe is needed
             if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
@@ -54,17 +52,28 @@ namespace BackgroundManager
                 execPath = execPath.Replace(".dll", "");
             }
 
-            string args = callPath + " " + Handle.repo + " \"" + execPath + "\"";
-            
+
+            //string binCallPath = "\"" + Path.Combine(Directory.GetCurrentDirectory(), Data.autostartEnablePath) + "\"";
+            // exec is always in the same directory
+            string binCallPath = "SetAutostart.exe";
+
+
+            string args = " " + Handle.repo + " \"" + execPath + "\"";            
             // append "0" for disabled, 1 else
             args += (isEnabled) ? " \"1\"" : " \"0\"";
-            
-            // else will enable autostart
+                        
 
             //TODO: rm
             Console.WriteLine("Changing autostart: " + args);
-            var p = Process.Start(args);
-            p.WaitForExit();
+            using(Process p = new Process())
+            {
+                p.StartInfo.FileName = binCallPath;
+                p.StartInfo.Arguments = args;
+
+                p.Start();
+
+                p.WaitForExit();
+            }            
         }
 
         

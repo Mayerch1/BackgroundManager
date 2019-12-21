@@ -81,20 +81,27 @@ namespace BackgroundManager.ImageManager
             string cacheFile = Path.Combine(Handle.data.TempDir, (Data.uuidMonitorInfo + ".txt"));
             string imageFile = Path.Combine(Handle.data.SettingsDir, Data.uuidImageCache + ".png");
 
-            string setWallpaperExec = "\"" + Path.Combine(Directory.GetCurrentDirectory(), Data.wallpaperSetterPath) + "\"";
-            string setWallpaperArg = setWallpaperExec + " " + "--set-image";
+            //string setWallpaperExec = "\"" + Path.Combine(Directory.GetCurrentDirectory(), Data.wallpaperSetterPath) + "\"";
+            string setWallpaperExec = Data.wallpaperSetterPath;
+            string setWallpaperArg = "--set-image";
 
             // set one image per screen
             if (Handle.data.SelectedWallpaperType == DataStorage.Data.WallpaperType.SeperateImagePerScreen)
             {
                 // get monitor info from dedicated c++ application, "" around argument and path
-                string getMonInfoArg = setWallpaperExec + " " + "--monitor" + " \"" + cacheFile + "\"";
-
+                string getMonInfoArg = "--monitor" + " \"" + cacheFile + "\"";
 
                 //TODO: rm
                 Console.WriteLine("Detect screen dimensions: " + getMonInfoArg);
-                var infoProcess = Process.Start(getMonInfoArg);
-                infoProcess.WaitForExit();
+
+                using (Process infoProcess = new Process())
+                {
+                    infoProcess.StartInfo.FileName = setWallpaperExec;
+                    infoProcess.StartInfo.Arguments = getMonInfoArg;
+                    infoProcess.Start();
+
+                    infoProcess.WaitForExit();
+                }
 
                 // read the data
                 string monInfoStr = File.ReadAllText(cacheFile);
@@ -163,8 +170,15 @@ namespace BackgroundManager.ImageManager
 
             //TODO: rm
             Console.WriteLine("Set wallpaper: " + setWallpaperArg);
-            var setProcess = Process.Start(setWallpaperArg);
-            setProcess.WaitForExit();
+            using(Process setProcess = new Process())
+            {
+                setProcess.StartInfo.FileName = setWallpaperExec;
+                setProcess.StartInfo.Arguments = setWallpaperArg;
+
+                setProcess.Start();
+
+                setProcess.WaitForExit();
+            }            
 
         }
     }

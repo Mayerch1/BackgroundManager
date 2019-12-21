@@ -70,11 +70,11 @@ namespace BackgroundManager
             }
             else
             {
-                settingsDir = Environment.ExpandEnvironmentVariables("$HOME");
-                settingsDir += "/." + saveFolder;
+                settingsDir = "~/." + saveFolder;                
             }
 
             settingsPath = Path.Combine(settingsDir, fileName);
+            settingsPath = Path.GetFullPath(settingsPath);
 
            
             // first look in the execution directory for portable applications
