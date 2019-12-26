@@ -18,7 +18,7 @@ namespace DataStorage
         // these are used to store temporary information, like coordinates of all screens
         public static string uuidImageCache = "7af49940-bf8a-4358-86b0-517c9cacd0ab";
         public static string uuidMonitorInfo = "bba0cc0a-8ea3-4834-ab5d-565f818a8f61";
-        public static string uuidApplication = "95f8dc8d-0e8e-4c6d-9776-1445b21123b0";
+        public static string uuidApplication = "BackgroundMgr-95f8dc8d-0e8e-4c6d-9776-1445b21123b0";
 
         #endregion statics
         #region types

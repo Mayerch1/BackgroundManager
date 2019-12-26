@@ -9,10 +9,22 @@
  * 
  */
 
+#ifndef _WIN32
+#define REGISTRY
 #include <Windows.h>
+#else
+
+#define SYSTEM_D
+#include <stdlib.h>
+#include <unistd.h>
+
+#include <fstream>
+#include <filesystem>
+
+#endif
 
 
-#ifdef _WIN32
+#if defined REGISTRY
 /**
  * @brief Place the applications path into the registry for autostart
  *        Robust for double enable or double disable
@@ -66,7 +78,100 @@ int setRegistry(const char* keyName, const char* keyData, bool enableKey)
 
     return rc;
 }
-#endif
+// endif REGISTRY
+#elif defined SYSTEM_D
+ /**
+* @brief Creates SystemD service for the application
+*
+* @param appName name of the application, e.g. shown in task manager
+* @param appPath absolute path to the executable
+* @param enableKey indicates if autostart should be enabled or disabled
+* @return int - 0 for success
+*/
+int setSystemD(const char* appName, const char* appPath, bool enableKey)
+{
+    std::string serviceName = appName;
+    serviceName += ".service";
+
+
+    std::string systemdPath = "/etc/systemd/system/";
+    std::string servicePathFull = systemdPath + serviceName;
+
+    int rc = 0;
+
+
+    bool serviceExisting = false;
+
+
+    // make sure the specified service is existing (and is a file)
+    serviceExisting = (std::filesystem::exists(servicePathFull) && std::filesystem::is_regular_file(servicePathFull));
+   
+
+
+    if (enableKey) {
+
+        // if file is existing, it is enough to enable the service
+        if (!serviceExisting) {
+            // current limit of username is 32 chars
+            char uName[256];
+            rc = getlogin_r(uName, 32);
+            if (rc == 0) {
+                std::string serviceContent = "[Unit]\n";
+
+                //TODO: fill in user and ExecStart
+                serviceContent += "Description=BackgroundManager\n";
+                serviceContent += "network.target\n";
+                serviceContent += "\n";
+
+                serviceContent += "[Service]\n";
+                serviceContent += "User=";
+                serviceContent += uName;
+                serviceContent += "\n";
+
+                serviceContent += "Type=simple\n";
+                serviceContent += "ExecStart=";
+                serviceContent += appPath;
+                serviceContent += "\n";
+
+                serviceContent += "\n";
+
+                serviceContent += "[Install]\n";
+                serviceContent += "WantedBy=multi-user.target\n";
+
+
+                std::ofstream out(servicePathFull);
+                out << serviceContent;
+                out.close();
+            }
+        }
+
+        
+        // only enable autostart, the program is already running
+        std::string enableCmd = "systemctl enable ";
+        enableCmd += serviceName;
+
+        rc = system(enableCmd.c_str());
+    }
+    else {
+        if (serviceExisting) {
+            // disable service but do not stop itself
+            std::string disableStr = "systemctl disable ";
+            disableStr += serviceName;
+
+            rc = system(disableStr.c_str());
+
+            std::remove(servicePathFull.c_str());
+        }
+        // else nothing todo
+    }
+    
+    return rc;
+}
+#endif // REGISTRY || SYSTEM_D
+
+
+
+
 
 /**
  * @brief Add autostart entry for application, based on the platform
@@ -78,11 +183,19 @@ int setRegistry(const char* keyName, const char* keyData, bool enableKey)
  * @return int 
  */
 int enableAutostart(const char* appName, const char* appPath, const char* isEnabled) {
-#ifdef _WIN32    
+
     bool enableAutostart = (isEnabled[0] == '0') ? false : true;
+
+#if defined REGISTRY
+
     return setRegistry(appName, appPath, enableAutostart);
-#else
-#endif
+
+#elif defined SYSTEM_D
+
+    return setSystemD(appName, appPath, enableAutostart);
+
+#endif // SYSTEM_D
+
 }
 
 /**
