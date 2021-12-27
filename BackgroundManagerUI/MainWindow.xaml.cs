@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Diagnostics;
 
 namespace BackgroundManagerUI
 {
@@ -71,6 +72,20 @@ namespace BackgroundManagerUI
             interval_h.Text = Data.Interval.Hours.ToString();
             interval_m.Text = Data.Interval.Minutes.ToString();
             interval_s.Text = Data.Interval.Seconds.ToString();
+
+            var procs = Process.GetProcesses();
+            foreach (var proc in procs)
+            {
+                var match = Data.AppBlacklistOptions.Where(i => i.Name == proc.ProcessName).ToList();
+
+                if (match.Count == 0)
+                {
+                    Data.AppBlacklistOptions.Add(new DataStorage.ProcType(proc));
+                }
+            }
+
+
+            Data.AppBlacklistOptions = new System.Collections.ObjectModel.ObservableCollection<DataStorage.ProcType>(Data.AppBlacklistOptions.OrderByDescending(i => i.StartTime).ThenBy(i => i.Name));
         }
 
         private void setEditBoxes(DataStorage.PathType path)
@@ -305,5 +320,51 @@ namespace BackgroundManagerUI
         }
 
         #endregion propertyChanged
+
+        private void list_blackList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Delete)
+                btn_blackList_rm_Click(null, null);
+        }
+
+        private void list_blackListOptions_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.Enter)
+                btn_blackList_add_Click(null, null);
+        }
+
+
+
+        private void btn_blackList_rm_Click(object sender, RoutedEventArgs e)
+        {
+            var now = DateTime.Now;
+
+            System.Collections.IList items = (System.Collections.IList)list_blackList_active.SelectedItems;
+            var collection = items.Cast<string>();
+            var selected = new List<string>(collection);
+
+            foreach (string item in selected)
+            {
+                Data.AppBlacklist.Remove(item);
+                Data.AppBlacklistOptions.Add(new DataStorage.ProcType(item, now));
+            }
+
+            Data.AppBlacklistOptions = new System.Collections.ObjectModel.ObservableCollection<DataStorage.ProcType>(Data.AppBlacklistOptions.OrderByDescending(i => i.StartTime).ThenBy(i => i.Name));
+        }
+
+        private void btn_blackList_add_Click(object sender, RoutedEventArgs e)
+        {
+            System.Collections.IList items = (System.Collections.IList)list_blackList_options.SelectedItems;
+            var collection= items.Cast<DataStorage.ProcType>();
+            var selected = new List<DataStorage.ProcType>(collection);
+
+            foreach (DataStorage.ProcType item in selected)
+            {
+                Data.AppBlacklist.Add(item.Name);
+                Data.AppBlacklistOptions.Remove(item);
+            }
+
+            Data.AppBlacklist = new System.Collections.ObjectModel.ObservableCollection<string>(Data.AppBlacklist.OrderBy(i => i));
+        }
     }
 }

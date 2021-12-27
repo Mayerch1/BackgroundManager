@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace BackgroundManager.ImageManager
 {
@@ -14,6 +15,25 @@ namespace BackgroundManager.ImageManager
         private const int SPI_SETDESKWALLPAPER = 20;
         private const int SPIF_SENDWININICHANGE = 0x2;
         private const int SPIF_UPDATEINIFILE = 0x1;
+
+        /// <summary>
+        /// check if the current system status allows a change of wallaper
+        /// tests if any of the blacklisted apps are running
+        /// </summary>
+        /// <returns>False if a blacklisted app is runningü</returns>
+        private bool isChangeAllowed()
+        {
+            foreach(var proc in Handle.data.AppBlacklist)
+            {
+                var pname = Process.GetProcessesByName(proc);
+                if(pname.Length > 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// Select random images out of the valid pool
@@ -87,6 +107,11 @@ namespace BackgroundManager.ImageManager
         /// </summary>
         public void setImage()
         {
+            if (!isChangeAllowed())
+            {
+                return;
+            }
+
             // registry key to set wallpaper mode (tile, stretch, fill,...)
             Microsoft.Win32.RegistryKey key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop", true);
             // set one image per screen

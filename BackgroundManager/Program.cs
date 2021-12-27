@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using BackgroundManagerUI;
+using Mayerch1.GithubUpdateCheck;
 using WinFormApplication = System.Windows.Forms.Application;
 using WpfApplication = System.Windows.Application;
 
@@ -80,8 +81,8 @@ namespace BackgroundManager
 
         private static async Task<bool> checkVersion()
         {
-            var updateChecker = new GithubUpdateChecker.GithubUpdateChecker(Handle.author, Handle.repo);
-            return await updateChecker.CheckForUpdateAsync(Handle.version, GithubUpdateChecker.VersionChange.Revision);
+            var updateChecker = new GithubUpdateCheck(Handle.author, Handle.repo);
+            return await updateChecker.IsUpdateAvailableAsync(Handle.version, Mayerch1.GithubUpdateCheck.VersionChange.Revision);
         }
 
 

@@ -58,6 +58,9 @@ namespace DataStorage
 
         private ObservableCollection<PathType> pathList = new ObservableCollection<PathType>();
 
+        private ObservableCollection<string> appBlacklist = new ObservableCollection<string>();
+        private ObservableCollection<ProcType> appBlacklistOptions = new ObservableCollection<ProcType>();
+
         private TimeSpan interval = TimeSpan.FromHours(1);
         private long intervalTicks = 1;
 
@@ -95,10 +98,25 @@ namespace DataStorage
             set { pathList = value; OnPropertyChanged("PathList"); }
         }
 
+        public ObservableCollection<string> AppBlacklist
+        {
+            get => appBlacklist;
+            set { appBlacklist = value; OnPropertyChanged("AppBlacklist"); }
+        }
+
+        
+
         public long IntervalTicks
         {
             get => interval.Ticks;
             set { intervalTicks = value; Interval = new TimeSpan(value); OnPropertyChanged("IntervalTicks"); }
+        }
+
+        [XmlIgnore]
+        public ObservableCollection<ProcType> AppBlacklistOptions
+        {
+            get => appBlacklistOptions;
+            set { appBlacklistOptions = value; OnPropertyChanged("AppBlacklistOptions"); }
         }
 
         [XmlIgnore]
